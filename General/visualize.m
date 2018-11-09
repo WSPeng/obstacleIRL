@@ -8,9 +8,11 @@ sp = figure(1); % sp is the figure
 feval(strcat(test_result.mdp,'draw'), sp, reward, test_result, ...
     mdp_params);
 
+disp(test_result.R);
+
 % Draw reward for IRL result.
-sp2 = figure(2);
-set(gca,'position',[0.5 0 0.5 1.0]);
+% sp2 = figure(2);
+% set(gca,'position',[0.5 0 0.5 1.0]);
 % feval(strcat(test_result.mdp,'draw'), test_result.reward, test_result, ...
 %    test_result.mdp_params);
 

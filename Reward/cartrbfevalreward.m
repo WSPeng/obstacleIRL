@@ -6,19 +6,19 @@ function [r,g,drdu,d2rdudu,drdx,d2rdxdx,gfull,Hfull] = ...
 % only give 1 output : reward
 
 % Get constants.
-T = size(u,1);
-Du = size(u,2);
-Dx = size(states,2);
+% T = size(u,1);
+% Du = size(u,2);
+% Dx = size(states,2);
 
 % Convert states to Cartesian space. Here the states is the position given
 % by Simulation function
 pts = states;
 
 % Compute distances.
-d = bsxfun(@minus, reward.pos, pts);
+d = bsxfun(@minus, reward.pos', pts);
 
 % Compute value.
-r = reward.r*exp(-0.5*reward.width*sum(d.^2,2)); % the rbf equation
+r = reward.r(1)*exp(-0.5*reward.width*sum(d.^2,2)); % the rbf equation
 
 if nargout >= 2
     % Compute gradient.

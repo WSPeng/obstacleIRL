@@ -42,7 +42,6 @@ if ~isempty(example_samples.sim_result)
         % all the points in trajectory is included in the sim_result
         pts = example_samples.sim_result{i}.x;
         % x is the position, xd is the velocity
-        pts = pts';
         
         % Plot the points.
         width_factor = 1;

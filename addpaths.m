@@ -15,3 +15,7 @@ end
 if isempty(regexp(path,['Reward' pathsep], 'once'))
     addpath([pwd, '/Reward']);
 end
+
+if isempty(regexp(path,['Algorithm' pathsep], 'once'))
+    addpath([pwd, '/Algorithm']);
+end

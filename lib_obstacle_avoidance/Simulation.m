@@ -260,16 +260,16 @@ while true
 %         xd(:,i,:)=reshape(fn_handle(squeeze(x(:,i,:))-XT),[d 1 nbSPoint]);
         x(:,end,:) = [];
         t(end) = [];
-        fprintf('Number of Iterations: %1.0f\n',i)
+        % fprintf('Number of Iterations: %1.0f\n',i)
         tmp='';
         for j=1:d
             tmp=[tmp ' %1.4f ;'];
         end
         tmp=tmp(2:end-2);
-        fprintf('Final Time: %1.2f (sec)\n',t(1,end,1))
-        fprintf(['Final Point: [' tmp ']\n'],squeeze(x(:,end,:)))
-        fprintf(['Target Position: [' tmp ']\n'],xT(:,end))
-        fprintf('## #####################################################\n\n\n')
+        % fprintf('Final Time: %1.2f (sec)\n',t(1,end,1))
+        % fprintf(['Final Point: [' tmp ']\n'],squeeze(x(:,end,:)))
+        % fprintf(['Target Position: [' tmp ']\n'],xT(:,end))
+        % fprintf('## #####################################################\n\n\n')
         
         if i>options.i_max-2
             fprintf('Simulation stopped since it reaches the maximum number of allowed iterations i_max = %1.0f\n',i)
