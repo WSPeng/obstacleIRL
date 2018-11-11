@@ -1,4 +1,5 @@
-function theta = max_demo_reward(test_result)
+function theta = max_demo_reward(mdp_data, test_result)
+% max theta to max difference of optimal to demos/
 
 theta = ones(2,1);
 

@@ -71,7 +71,7 @@ else
     options = check_options(varargin{1}); % Checking the given options, and add ones are not defined.
 end
 
-if options.model == 2; %2nd order
+if options.model == 2 %2nd order
     d=size(x0,1)/2; %dimension of the model
     if isempty(xT)
         xT = zeros(2*d,1);
@@ -126,7 +126,7 @@ end
 for i=1:nbSPoint
     x(:,1,i) = x0(:,i);
 end
-if options.model == 2; %2nd order
+if options.model == 2 %2nd order
     xd = zeros(d,1,nbSPoint);
 else
     xd = zeros(size(x));
@@ -190,7 +190,7 @@ while true
         % after adding perturbation
         for j=1:nbSPoint
             % calling the function obs_modulation_ellipsoid ..
-            [xd(:,i,j) b_contour(j)] = obs_modulation_ellipsoid(x(:,i,j),xd(:,i,j),obs,b_contour(j),xd_obs);
+            [xd(:,i,j), b_contour(j)] = obs_modulation_ellipsoid(x(:,i,j),xd(:,i,j),obs,b_contour(j),xd_obs);
         end
 
     end
@@ -198,7 +198,7 @@ while true
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%% Integration
     
-    if options.model == 2; %2nd order
+    if options.model == 2 %2nd order
         x(d+1:2*d,i+1,:)=x(d+1:2*d,i,:)+xd(:,i,:)*options.dt;
         x(1:d,i+1,:)=x(1:d,i,:)+x(d+1:2*d,i,:)*options.dt;
     else
@@ -261,11 +261,11 @@ while true
         x(:,end,:) = [];
         t(end) = [];
         % fprintf('Number of Iterations: %1.0f\n',i)
-        tmp='';
-        for j=1:d
-            tmp=[tmp ' %1.4f ;'];
-        end
-        tmp=tmp(2:end-2);
+        % tmp='';
+        % for j=1:d
+        %     tmp=[tmp ' %1.4f ;'];
+        % end
+        % tmp=tmp(2:end-2);
         % fprintf('Final Time: %1.2f (sec)\n',t(1,end,1))
         % fprintf(['Final Point: [' tmp ']\n'],squeeze(x(:,end,:)))
         % fprintf(['Target Position: [' tmp ']\n'],xT(:,end))

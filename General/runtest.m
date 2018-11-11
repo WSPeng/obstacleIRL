@@ -27,9 +27,9 @@ mdp_params.bounds = [10;10];
 if mdp_params.naive_table.bool
     bounds = [mdp_params.naive_table.rho_bound,...
               mdp_params.naive_table.sf_bound];
-    cell = mdp_params.naive_table.cell;
+    cells = mdp_params.naive_table.cell;
     % state_grid first col is rho, the second col is sf.
-    state_grid = buildgrid(bounds, cell);
+    state_grid = buildgrid(bounds, cells);
     
     mdp_data.grid_reward = [state_grid, zeros(length(state_grid),2)];
     
@@ -53,7 +53,7 @@ if mdp_params.naive_table.bool
         
         R_length = trajectory_length_reward(reward, x);
         
-        mdp_data.grid_reward(i,end-1:end) = [R_dist, R_length];
+        mdp_data.grid_reward(i,end-1:end) = [R_dist, R_length]; % 3 and 4 column
         
     end
 end
@@ -62,7 +62,7 @@ end
 rho = [5,    6, 3,   4,   4];
 sf =  [1.25, 1, 1.6, 1.4, 1.5];
 
-sim_result = cell(length(rho));
+sim_result = cell(length(rho),1);
 
 % package the test result
 test_result = struct('mdp', mdp);
@@ -93,10 +93,11 @@ for i = 1:length(rho)
         R_dist = R_dist + cartrbfevalreward(reward, sim_result{i}.x(j,:));
     end
     
-    test_result.R{i} = [R_length; R_dist];
-    
-    max_demo_result(test_result);
+    test_result.R{i} = [R_length; R_dist]; % R_length anmd R_dist are all one number.
     
 end
+
+% the IRL
+theta = max_demo_reward(mdp_data, test_result);
 
 test_result.sim_result = sim_result;
