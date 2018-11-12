@@ -49,7 +49,27 @@ if ~isempty(example_samples.sim_result)
         
         % plot(pts(:,1),pts(:,end),'-','color',col,'marker','.','markersize',14*width_factor,'linewidth',1.5);
         plot(pts(:,1),pts(:,end),'-','marker','.','markersize',14*width_factor,'linewidth',0.5);
+        
     end
+    %len1 = strcat('rho ',num2str(mdp_params.opt_sim.obstacle{1}.rho), 'sf', num2str(mdp_params.opt_sim.obstacle{1}.sf));
+    %len2 = strcat('rho ',num2str(mdp_params.opt_sim.obstacle{1}.rho), 'sf', num2str(mdp_params.opt_sim.obstacle{2}.sf));
+    %len3 = strcat('rho ',num2str(mdp_params.opt_sim.obstacle{3}.rho), 'sf', num2str(mdp_params.opt_sim.obstacle{3}.sf));
+    %len4 = strcat('rho ',num2str(mdp_params.opt_sim.obstacle{4}.rho), 'sf', num2str(mdp_params.opt_sim.obstacle{4}.sf));
+    %len5 = strcat('rho ',num2str(mdp_params.opt_sim.obstacle{5}.rho), 'sf', num2str(mdp_params.opt_sim.obstacle{5}.sf));
+
+    % len1 = strcat('rho ',num2str(5), 'sf', num2str(1.25));
+    % len2 = strcat('rho ',num2str(6), 'sf', num2str(1));
+    % len3 = strcat('rho ',num2str(3), 'sf', num2str(1.6));
+    % len4 = strcat('rho ',num2str(4), 'sf', num2str(1.4));
+    % len5 = strcat('rho ',num2str(4), 'sf', num2str(1.5));
+
+    len1 = strcat('rho ',num2str(8), 'sf', num2str(1.55));
+    len2 = strcat('rho ',num2str(7.5), 'sf', num2str(1.6));
+    len3 = strcat('rho ',num2str(7), 'sf', num2str(1.5));
+    len4 = strcat('rho ',num2str(7.8), 'sf', num2str(1.48));
+    len5 = strcat('rho ',num2str(7.6), 'sf', num2str(1.59));
+    
+    legend('','','','','','',len1, len2, len3, len4, len5, 'theoptimal')
 end
 
 % Finished.

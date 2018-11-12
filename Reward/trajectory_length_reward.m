@@ -15,4 +15,4 @@ pts = states;
 d = diff(pts);
 
 % Compute value.
-r = reward.r(2)*sum(sqrt(sum(d.^2,2))); % the rbf equation
+r = reward.r(2)*sum(sqrt(sum(d.^2,2))); % the rbf equationplot

@@ -2,6 +2,8 @@
 function [test_result, mdp_params, reward] = runtest(algorithm,algorithm_params,...
     mdp,mdp_params,test_params)
 
+read_mat = 0;
+
 % test_result - structure that contains results of the test
 
 % algorithm - string specifying the IRL algorithm to use
@@ -18,7 +20,7 @@ rng(1);
 % Set default test parameters.
 % test_params = setdefaulttestparams(test_params);
 
-mdp_params.bounds = [10;10];
+mdp_params.bounds = [10;10]; % the bound of working space
 
 % Construct MDP and features.
 [mdp_data, mdp_params, reward] = feval(strcat(mdp,'build'), mdp_params);
@@ -33,34 +35,59 @@ if mdp_params.naive_table.bool
     
     mdp_data.grid_reward = [state_grid, zeros(length(state_grid),2)];
     
-    for i = 1: length(state_grid)
-        rho = state_grid(i, 1);
-        sf = state_grid(i, 2);
-        
-        mdp_params.opt_sim.obstacle{1}.rho = rho;
-        mdp_params.opt_sim.obstacle{1}.sf = sf;
+    sim_result = cell(length(mdp_data.grid_reward),1);
     
-        x0 = mdp_params.start_point; % the start point position
-        xT = mdp_params.target_point; % the target point position
-        varargin = mdp_params.opt_sim;
-        
-        [x, ~, ~, ~, ~] = Simulation(x0, xT, mdp_data.handle, varargin);
-        x = x';
-        R_dist = 0;
-        for j = 1: length(x)
-            R_dist = R_dist + cartrbfevalreward(reward, x(j,:));
+    if read_mat
+	    for i = 1: length(state_grid)
+            if mod(i,100) == 0
+	            disp('state_grid loop')
+	            disp(i)
+	        end
+	            rho = state_grid(i, 1);
+	        sf = state_grid(i, 2);
+	        
+	        mdp_params.opt_sim.obstacle{1}.rho = rho;
+	        mdp_params.opt_sim.obstacle{1}.sf = sf;
+	    
+	        x0 = mdp_params.start_point; % the start point position
+	        xT = mdp_params.target_point; % the target point position
+	        varargin = mdp_params.opt_sim;
+	        
+	        [x, ~, ~, ~, ~] = Simulation(x0, xT, mdp_data.handle, varargin);
+	        x = x';
+	        R_dist = 0;
+	        for j = 1: length(x)
+	            R_dist = R_dist + cartrbfevalreward(reward, x(j,:));
+	        end
+	        
+	        R_length = trajectory_length_reward(reward, x);
+	        
+	        mdp_data.grid_reward(i,end-1:end) = [R_dist, R_length]; % 3 and 4 column
+            
+            % store the trajectory
+            sim_result{i}.x = x;
         end
         
-        R_length = trajectory_length_reward(reward, x);
+        savem = mdp_data.grid_reward;
+	    save('grid_reward.mat','savem');
+        save('grid_trajectory.mat','sim_result')
         
-        mdp_data.grid_reward(i,end-1:end) = [R_dist, R_length]; % 3 and 4 column
-        
+    else
+		savem = load('grid_reward.mat');
+        mdp_data.grid_reward = [];
+        mdp_data.grid_reward = savem.savem;
+	
     end
 end
     
 % manually defined parameters
-rho = [5,    6, 3,   4,   4];
-sf =  [1.25, 1, 1.6, 1.4, 1.5];
+% rho = [5,    6, 3,   4,   4];
+% sf =  [1.25, 1, 1.6, 1.4, 1.5];
+
+% another set of paramters?
+rho = [8,    7.5, 7,   7.8,   7.6, 8];
+sf =  [1.55, 1.6, 1.5, 1.48,  1.59, 1.6];
+
 
 sim_result = cell(length(rho),1);
 
@@ -93,11 +120,12 @@ for i = 1:length(rho)
         R_dist = R_dist + cartrbfevalreward(reward, sim_result{i}.x(j,:));
     end
     
-    test_result.R{i} = [R_length; R_dist]; % R_length anmd R_dist are all one number.
+    test_result.R{i} = [R_dist; R_length]; % R_length anmd R_dist are all one number.
     
 end
 
 % the IRL
-theta = max_demo_reward(mdp_data, test_result);
+
+% theta = max_demo_reward(mdp_data, test_result);
 
 test_result.sim_result = sim_result;

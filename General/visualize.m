@@ -2,8 +2,9 @@
 function visualize(test_result, mdp_params, reward)
 
 % Draw reward for ground truth.
-fig(1) = figure('name','draw','position',[100 550 560 420]);
-sp = figure(1); % sp is the figure
+fig_n = get(gcf,'Number');
+fig(fig_n) = figure('name','draw','position',[100 550 560 420]);
+sp = figure(fig_n); % sp is the figure
 % set(gca,'position',[0 0 0.5 1.0]); % it divide the plot to two pieces
 feval(strcat(test_result.mdp,'draw'), sp, reward, test_result, ...
     mdp_params);

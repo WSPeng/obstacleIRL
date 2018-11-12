@@ -119,7 +119,9 @@ for n=1:N
     x_t = R(:,:,n)'*(x-obs{n}.x0);
     [E(:,:,n), Gamma(n)] = compute_basis_matrix(d,x_t,obs{n});
     if Gamma(n)<0.99
-        disp(Gamma(n))
+        % Note: why we need to print Gamma
+        % disp('Gamma');
+        % disp(Gamma(n));
     end
 end
 
@@ -142,7 +144,7 @@ xd = xd-xd_obs; %computing the relative velocity with respect to the obstacle
 % last (i.e. higher priority)
 % TODO: can we compute it together? 
 [~,obs_order] = sort(Gamma,'descend');
-for n = obs_order;
+for n = obs_order
     if isfield(obs{n},'rho')
         rho = obs{n}.rho;
     else
@@ -179,7 +181,8 @@ end
 if b_contour==1
     contour_dir = sum(E(:,obs{n}.extra.ind,n),2); %extra.ind defines the desired eigenvalues to move along it
     contour_dir = contour_dir/norm(contour_dir);
-    disp(xd'*E(:,1,n))
+    % NOTE why we plpot
+    % disp(xd'*E(:,1,n))
    
     if (xd'*E(:,1,n)>0) %%(contour_dir'*M*xd >0 && norm(M*xd) > 0.05) || 
         b_contour = false;
