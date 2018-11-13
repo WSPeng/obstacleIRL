@@ -20,7 +20,7 @@ for idx = linspace(0.01,100,200)
     
     R_ = R(R >= max(R_example));
     
-    if length(R_)<1/8*length(R_dist) && ~isempty(R_)
+    if length(R_)<1/4*length(R_dist) && ~isempty(R_)
         disp(length(R_));
         disp(idx);
         % after determine the feasible thetas, max to get the optimal one
@@ -39,15 +39,15 @@ for idx = linspace(0.01,100,200)
         
         % calculate the distance
         mesh_max = max(R_)*ones(5,1);
-        dist = sum(mesh_max - R_example')/sum(abs(R_example))*100;
+        dist = sum(mesh_max - R_example')/;
         disp(dist)
         
         figure;
         axis([0,8,0.9,1.6])
         hold on
         plot_example()
-        [~,xxx] = intersect(R,max(R_),'stable');
-        % [~,xxx] = intersect(R,R_,'stable');
+        % [~,xxx] = intersect(R,max(R_),'stable');
+        [~,xxx] = intersect(R,R_,'stable');
         plot(mdp_data.grid_reward(xxx,1),mdp_data.grid_reward(xxx,2),'o')
         
     end

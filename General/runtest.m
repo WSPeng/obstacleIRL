@@ -81,12 +81,14 @@ if mdp_params.naive_table.bool
 end
     
 % manually defined parameters
-% rho = [5,    6, 3,   4,   4];
-% sf =  [1.25, 1, 1.6, 1.4, 1.5];
+rho = [5,    6, 3,   4,   4];
+sf =  [1.25, 1, 1.6, 1.4, 1.5];
+% 2.5223 correspondting to 3.8 and 1.32, which is pretty good?
+
 
 % another set of paramters?
-rho = [8,    7.5, 7,   7.8,   7.6, 8];
-sf =  [1.55, 1.6, 1.5, 1.48,  1.59, 1.6];
+% rho = [8,    7.5, 7,   7.8,   7.6];%, 8];
+% sf =  [1.55, 1.6, 1.5, 1.48,  1.59];%, 1.6];
 
 
 sim_result = cell(length(rho),1);
@@ -126,6 +128,6 @@ end
 
 % the IRL
 
-% theta = max_demo_reward(mdp_data, test_result);
+theta = max_demo_reward(mdp_data, test_result);
 
 test_result.sim_result = sim_result;
