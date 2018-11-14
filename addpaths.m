@@ -19,3 +19,31 @@ end
 if isempty(regexp(path,['Algorithm' pathsep], 'once'))
     addpath([pwd, '/Algorithm']);
 end
+
+if isempty(regexp(path,['Auglag' pathsep], 'once'))
+    addpath([pwd, '/Auglag']);
+end
+
+if isempty(regexp(path,['GPIRL' pathsep], 'once'))
+    addpath([pwd, '/GPIRL']);
+end
+
+if isempty(regexp(path,['Laplace' pathsep], 'once'))
+    addpath([pwd, '/Laplace']);
+end
+
+if isempty(regexp(path,['MaxEnt' pathsep], 'once'))
+    addpath([pwd, '/MaxEnt']);
+end
+
+if isempty(regexp(path,['Robotarm' pathsep], 'once'))
+    addpath([pwd, '/Robotarm']);
+end
+
+if isempty(regexp(path,['Utilities' pathsep], 'once'))
+    addpath([pwd, '/Utilities']);
+end
+addpath Utilities/minFunc
+addpath Utilities/plot2svg
+
+addpath FastHess

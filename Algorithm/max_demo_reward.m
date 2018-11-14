@@ -41,6 +41,8 @@ for idx = linspace(0.01,100,200)
         mesh_max = max(R_)*ones(5,1);
         dist = sum(mesh_max - R_example')/sum(abs(R_example))*100;
         disp(dist)
+        disp('00')
+        disp((max(R_)-R_example)/(max(R_)-min(R)))
         
         figure;
         axis([0,8,0.9,1.6])

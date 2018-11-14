@@ -1,9 +1,5 @@
 % Build grid for discretization.
-function vals = buildgrid(bounds,cells,quad)
-
-if quad
-    bounds = signbounds.*sqrt(abs(bounds));
-end
+function vals = buildgrid(bounds,cells)
 
 D = size(bounds,2);
 SPLITS = cells+1;
@@ -28,7 +24,3 @@ end
 
 % Convert to array.
 vals = cell2mat(vcell(:));
-
-if quad
-    vals = sign(vals).*(vals.^2);
-end
