@@ -27,20 +27,45 @@ test_params = struct(...
         'example_optimal',1,...
         'example_recompute_optimal',1,...
         'test_optimal',1,...
-        'cells_state',10,...
+        'cells_state',1,... %was 10
         'cells_action',1,...  % was 5
         'verbosity',4);
 restarts = 8;
 world = 'robotarm';
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+obs_params = {};
+obs_params.x0 = [0; 2.2];
+obs_params.xT = [];
+obs_params.fn_handle = @move_constant_v;
+
+obs{1}.a = [1.2 1.2;0.4 1];
+obs{1}.p = [2 1;1 1];
+obs{1}.partition = [-pi 0;0 pi];
+obs{1}.sf = [1.2;1.2]; % the safety factor
+obs{1}.th_r = 0*pi/180;
+obs{1}.rho = 1;
+opt_sim.dt = 0.025; %integration time steps
+opt_sim.i_max = 1000; %maximum number of iterations
+opt_sim.tol = 0.05; %convergence tolerance
+opt_sim.plot = true; %enabling the animation
+opt_sim.obstacle = []; %no obstacle is defined
+obs{1}.x0 = [5;2];
+opt_sim.obstacle = obs;
+
+obs_params.opt_sim = opt_sim;
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Prepare MDP parameters.
 mdp_cat_name = 'Examples';
 mdp_param_names = {'4','8','16','32','64'};
 mdp_params = {struct(...
     'seed',0,...
-    'links',2,...
-    'linklen',[2.5 2.5],...
-    'linkmass',[100.0 100.0])}; % original value is 100.0
+    'links',2,...  % was 2
+    'linklen',[2.5,0.4],... % was [2.5 2.5]
+    'linkmass',[100.0,100.0],... % original value is [100.0, 100.0]
+    'obs_params', obs_params,...
+    'complex', 1)}; 
 
 % The dynamics robot arm uses Featherstone's algorithm to compute the real
 % mass matrix. This is more realistic, but it also makes discretizations
@@ -68,6 +93,7 @@ if cartesian
     mdp_params{1}.feature_type = 'cartesian';
 end
 
+% repmat the mdp_params to 1x5 cell
 mdp_params = repmat(mdp_params,1,length(mdp_param_names));
 
 % Prepare test parameters.
@@ -114,3 +140,4 @@ visualize(test_result);
 %saveresults(test_file_name,test_params,test_metric_names,...
 %    mdp_params,mdp_cat_name,mdp_param_names,algorithms,names,colors,order,...
 %    restarts,series_result,transfer_result);
+end

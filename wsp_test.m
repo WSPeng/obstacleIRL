@@ -28,7 +28,9 @@ disp('  xd = [-x(1,:);0];')
 fn_handle = @move_costant_v;
 
 %x0 = [0*ones(1,20);linspace(0,10,20)]; %set of initial points, the first row are x coordinate
-x0 = [0,0*ones(1,2);2.2,linspace(0,10,2)];
+% x0 = [0,0*ones(1,2);2.2,linspace(0,10,2)];
+% only one start point case
+x0 = [0;2.2];
 
 % A set of parameters that should be defined for the simulation
 opt_sim.dt = 0.025; %integration time steps
