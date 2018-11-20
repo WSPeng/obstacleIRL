@@ -31,6 +31,7 @@ if COMPLEX
     a = zeros(T,1);
 else
     % compute the points
+    % the first column of ptx and pty are the middle joint.
     ptx = [zeros(T,1), states(:,1)];
     pty = [zeros(T,1), states(:,2)];
 end
@@ -54,8 +55,12 @@ end
 
 if ~COMPLEX
     if nargout > 2
-        jac_x = ones(T,N,N);
-        jac_y = ones(T,N,N);
+        jac_x = zeros(T,N,N);
+        jac_y = zeros(T,N,N);
+        for i = 1:T
+            jac_x(i,:,:) = eye(N);
+            jac_y(i,:,:) = eye(N);
+        end
     end
 else
     if nargout > 2
@@ -78,8 +83,8 @@ end
 
 if ~COMPLEX
     if nargout > 4
-        jjacx = ones(T,N,N,N);
-        jjacy = ones(T,N,N,N);
+        jjacx = zeros(T,N,N,N);
+        jjacy = zeros(T,N,N,N);
     end
 else
     if nargout > 4

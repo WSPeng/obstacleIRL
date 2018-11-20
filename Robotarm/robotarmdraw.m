@@ -163,9 +163,9 @@ if ~isempty(example_samples)
         col = [0.3 0.3 0.7];
         if SHOW_END_EFFECTOR
             % Plot the end effector trajectory.
-            plot(ptx(:,end),pty(:,end),'-','color',col,'marker','.','markersize',6,'linewidth',1);
+            % plot(ptx(:,end),pty(:,end),'-','color',col,'marker','.','markersize',6,'linewidth',1);
             % Plot ending point.
-            plot(ptx(end,end),pty(end,end),'color',col,'marker','x','markersize',8,'linewidth',2);
+            % plot(ptx(end,end),pty(end,end),'color',col,'marker','x','markersize',8,'linewidth',2);
         end
         % Plot the arm at each step.
         %col = ones(1,3)*0.5;

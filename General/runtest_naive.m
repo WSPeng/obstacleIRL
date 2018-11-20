@@ -23,7 +23,7 @@ rng(1);
 mdp_params.bounds = [10;10]; % the bound of working space
 
 % Construct MDP and features.
-[mdp_data, mdp_params, reward] = feval(strcat(mdp,'build'), mdp_params);
+[mdp_data, mdp_params, reward] = feval(strcat(mdp,'build_naive'), mdp_params);
 
 % 
 if mdp_params.naive_table.bool

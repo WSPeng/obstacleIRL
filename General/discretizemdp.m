@@ -25,8 +25,8 @@ end
 
 % Compute state and action grid cells.
 % NOTE_wsp : these two vals, are combination of all possible disrete values
-state_vals = buildgrid(sbounds,cells_state,0);
-act_vals = buildgrid(abounds,cells_action,action_quad);
+state_vals = buildgrid(mdp_data, sbounds,cells_state,0);
+act_vals = buildgrid(mdp_data, abounds,cells_action,action_quad);
 
 % Compute transition probabilities.
 states = size(state_vals,1);

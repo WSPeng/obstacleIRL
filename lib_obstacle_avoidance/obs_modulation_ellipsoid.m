@@ -125,7 +125,7 @@ for n=1:N
     end
 end
 
-w = compute_weights(Gamma,N);
+w = compute_weights(Gamma,N); % for multiple obstacles
 
 % adding the influence of the rotational and cartesian velocity of the
 % obstacle to the velocity of the robot

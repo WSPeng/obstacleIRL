@@ -1,7 +1,7 @@
 % Construct the features and reward function for the robot arm domain.
 function [reward,features_pt,features_dyn] = robotarmfeatures(mdp_params,mdp_data)
 
-POSITIVE = 10;
+POSITIVE = 20;
 NEGATIVE = -15;
 
 % First create the features, which for now are RBF functions centered at
@@ -11,7 +11,8 @@ features_dyn = cell(1,1);
 features_dyn{1} = struct('type','dist','r',-1.0,'idx',1:mdp_data.udims);
 for i=1:length(mdp_data.objects)
     features_pt{i} = struct('type','fkrbf','pos',[mdp_data.objects(i).pos(:,1) mdp_data.objects(i).pos(:,end)],...
-                      'width',mdp_params.feature_radius,'r',1.0);
+                      'width',mdp_params.feature_radius,'r',1.0); % ws 1.0
+                  % so what is this r?
 end
 
 % Create reward as linear combination of features. Objects where c1 = 1 are
@@ -44,6 +45,7 @@ elseif strcmp(mdp_params.feature_type,'cartesian')
     features_pt{2} = struct('type','fk','idx',2,'r',1.0);
 elseif strcmp(mdp_params.feature_type,'grid')
     % RBF grid.
+    %{
     GRID_STEPS = 10;
     features_pt = cell(1,GRID_STEPS*GRID_STEPS);
     for x=1:GRID_STEPS
@@ -53,4 +55,14 @@ elseif strcmp(mdp_params.feature_type,'grid')
                               'width',mdp_params.feature_radius,'r',1.0);
         end
     end
+    %}
+    features_pt = cell(1,3);
+    features_pt{1} = struct('type','fkrbf','pos',[0.5 0.22]*mdp_params.size,...
+                              'width',mdp_params.feature_radius,'r',1.0);
+    features_pt{2} = struct('type','fkrbf','pos',[-0.1 0.5]*mdp_params.size,...
+                              'width',mdp_params.feature_radius,'r',1.0);    
+    features_pt{3} = struct('type','fkrbf','pos',[1 0.5]*mdp_params.size,...
+                              'width',mdp_params.feature_radius,'r',1.0);                          
+    % features_pt{4} = struct('type','fkrbf','pos',[1   0.22]*mdp_params.size,...
+    %                           'width',mdp_params.feature_radius,'r',1.0);                         
 end

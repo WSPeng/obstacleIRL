@@ -18,8 +18,8 @@ else
     %            8,1.6, 0.5, 0.5];
     % abounds = [-4,-1,-0.1,-0.1;...
     %            4,  1, 0.1, 0.1];
-    sbounds = [0, 0,  0, 0.9;...
-               10, 10, 8, 1.6];
+    sbounds = [0, 2,  0, 0.9;...
+               10, 5.5, 8, 1.6];
     % abounds = [-1,-1,-2,-0.5;...
     %            1,  1, 2, 0.5];
     abounds = [-0.5,-0.1;...
@@ -28,11 +28,17 @@ end
 
 objects = struct('pos',[],'c1',[],'c2',[]);
 % Place objects in a fixed pattern.
+%{
 objects(1) = struct('pos',[0.5 0.5]*mdp_params.size,'c1',2,'c2',1);
 objects(2) = struct('pos',[0.3 0.3]*mdp_params.size,'c1',2,'c2',1);
 objects(3) = struct('pos',[0.7 0.3]*mdp_params.size,'c1',2,'c2',1);
 objects(4) = struct('pos',[0.3 0.7]*mdp_params.size,'c1',2,'c2',1);
 objects(5) = struct('pos',[0.7 0.7]*mdp_params.size,'c1',2,'c2',1);
+%}
+objects(1) = struct('pos',[0.5 0.22]*mdp_params.size,'c1',2,'c2',1);
+objects(2) = struct('pos',[-0.1 0.5]*mdp_params.size,'c1',2,'c2',1);
+objects(3) = struct('pos',[1 0.5]*mdp_params.size,'c1',2,'c2',1);
+% objects(4) = struct('pos',[1   0.22]*mdp_params.size,'c1',1,'c2',1);
 
 % Create MDP data structure.
 mdp_data = struct(...

@@ -7,8 +7,12 @@ end
 %% obstacle definition
 clear obs;
 obs{1}.a = [1.2 1.2;0.4 1];
+
+obs{1}.a = [1; 1];
 obs{1}.p = [2 1;1 1];
-obs{1}.partition = [-pi 0;0 pi];
+obs{1}.p = [1;1]
+% obs{1}.partition = [-pi 0;0 pi];
+obs{1}.partition = [-pi, pi];
 obs{1}.x0 = [-8;0];  % position of the obstacle
 obs{1}.sf = [1.2;1.2]; % the safety factor
 obs{1}.th_r = 0*pi/180;
@@ -28,14 +32,14 @@ disp('  xd = [-x(1,:);0];')
 fn_handle = @move_costant_v;
 
 %x0 = [0*ones(1,20);linspace(0,10,20)]; %set of initial points, the first row are x coordinate
-% x0 = [0,0*ones(1,2);2.2,linspace(0,10,2)];
+x0 = [0,0*ones(1,2);2.2,linspace(0,10,2)];
 % only one start point case
-x0 = [0;2.2];
+% x0 = [0;2.2];
 
 % A set of parameters that should be defined for the simulation
 opt_sim.dt = 0.025; %integration time steps
-opt_sim.i_max = 1000; %maximum number of iterations
-opt_sim.tol = 0.05; %convergence tolerance
+opt_sim.i_max = 50; %maximum number of iterations
+opt_sim.tol = 1; %convergence tolerance
 opt_sim.plot = true; %enabling the animation
 opt_sim.obstacle = []; %no obstacle is defined
 fig = [];
@@ -106,6 +110,6 @@ function y = move_costant_v(x)
     % y = [10-x(1,:);2.2-x(2,:)];
     % y = [10/size(x,2)*ones(1,size(x,2));...
     %     zeros(1,size(x,2))];
-    y = [10-x(1,:)+0.01;...
-        2.2-x(2,:)];
+    y = [10*ones(1,size(x,2));... % 10-x(1,:)
+        zeros(1,size(x,2))]; % 2.2-x(2,:)
 end

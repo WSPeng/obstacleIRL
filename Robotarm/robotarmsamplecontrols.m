@@ -1,4 +1,8 @@
 % Sample some random controls for robot arm.
 function u = robotarmsamplecontrols(n,mdp_data)
 
-u = randn(n,mdp_data.udims)*5.0;
+if mdp_data.complex
+    u = randn(n,mdp_data.udims)*5.0;
+else
+    u = randn(n,2)*[8, 0;0, 0.7] + ones(n,2)*[0,0;0,0.9];
+end

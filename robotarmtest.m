@@ -19,16 +19,16 @@ fprintf(1,'Starting run %i %i %i\n',a,s,r);
 % Set up constants.
 test_metric_names = metricnames();
 test_params = struct(...
-        'training_sample_lengths',32,...
+        'training_sample_lengths',120,...
         'training_samples',8,...
-        'test_samples',2,... % was 32 
+        'test_samples',1,... % was 32 
         'example_restarts',1,...
         'test_restarts',1,...
         'example_optimal',1,...
-        'example_recompute_optimal',1,...
+        'example_recompute_optimal',0,...
         'test_optimal',1,...
-        'cells_state',1,... %was 10
-        'cells_action',1,...  % was 5
+        'cells_state',5,... %was 10 6
+        'cells_action',2,...  % was 5
         'verbosity',4);
 restarts = 8;
 world = 'robotarm';
@@ -39,9 +39,12 @@ obs_params.x0 = [0; 2.2];
 obs_params.xT = [];
 obs_params.fn_handle = @move_constant_v;
 
-obs{1}.a = [1.2 1.2;0.4 1];
-obs{1}.p = [2 1;1 1];
-obs{1}.partition = [-pi 0;0 pi];
+% obs{1}.a = [1.2 1.2;0.4 1];
+obs{1}.a = [1;1];
+% obs{1}.p = [2 1;1 1];
+obs{1}.p = [1;1];
+% obs{1}.partition = [-pi 0;0 pi];
+obs{1}.partition = [-pi, pi];
 obs{1}.sf = [1.2;1.2]; % the safety factor
 obs{1}.th_r = 0*pi/180;
 obs{1}.rho = 1;
@@ -65,7 +68,7 @@ mdp_params = {struct(...
     'linklen',[2.5,0.4],... % was [2.5 2.5]
     'linkmass',[100.0,100.0],... % original value is [100.0, 100.0]
     'obs_params', obs_params,...
-    'complex', 1)}; 
+    'complex', 0)};   % 1 is robot arm case... 
 
 % The dynamics robot arm uses Featherstone's algorithm to compute the real
 % mass matrix. This is more realistic, but it also makes discretizations
@@ -99,7 +102,7 @@ mdp_params = repmat(mdp_params,1,length(mdp_param_names));
 % Prepare test parameters.
 test_params = {setdefaulttestparams(test_params)};
 test_params = repmat(test_params,1,length(mdp_param_names));
-test_params{1}.training_samples = 4;
+test_params{1}.training_samples = 1;
 test_params{2}.training_samples = 8;
 test_params{3}.training_samples = 16;
 test_params{4}.training_samples = 32;

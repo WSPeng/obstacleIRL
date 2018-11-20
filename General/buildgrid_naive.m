@@ -1,5 +1,5 @@
 % Build grid for discretization.
-function vals = buildgrid(bounds,cells)
+function vals = buildgrid_naive(bounds,cells)
 
 D = size(bounds,2);
 SPLITS = cells+1;
