@@ -106,7 +106,7 @@ if d==3
 else
     E = zeros(d,d,N);
 end
-R = zeros(d,d,N);
+R = zeros(d,d,N); % R is for rotating
 M = eye(d);
 
 for n=1:N
