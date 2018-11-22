@@ -47,3 +47,5 @@ addpath Utilities/minFunc
 addpath Utilities/plot2svg
 
 addpath FastHess
+addpath Test
+addpath Objectworld

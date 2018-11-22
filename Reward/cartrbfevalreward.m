@@ -1,21 +1,19 @@
 % Gaussian rbf in Cartesian space
 function [r,g,drdu,d2rdudu,drdx,d2rdxdx,gfull,Hfull] = ...
-    cartrbfevalreward(reward,states)
-%    cartrbfevalreward(reward,mdp_data,x,u,states,A,B,dxdu,d2xdudu)
-
-% only give 1 output : reward
+    cartrbfevalreward(reward,mdp_data,x,u,states,A,B,dxdu,d2xdudu)
+%    cartrbfevalreward(reward,states)
 
 % Get constants.
-% T = size(u,1);
-% Du = size(u,2);
-% Dx = size(states,2);
+T = size(u,1);
+Du = size(u,2);
+Dx = size(states,2);
 
 % Convert states to Cartesian space. Here the states is the position given
 % by Simulation function
 pts = states;
 
 % Compute distances.
-d = bsxfun(@minus, reward.pos', pts);
+d = bsxfun(@minus, reward.pos, pts);
 
 % Compute value.
 r = reward.r(1)*exp(-0.5*reward.width*sum(d.^2,2)); % the rbf equation

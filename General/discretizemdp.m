@@ -24,7 +24,6 @@ if ~isempty(example_samples)
 end
 
 % Compute state and action grid cells.
-% NOTE_wsp : these two vals, are combination of all possible disrete values
 state_vals = buildgrid(mdp_data, sbounds, cells_state, 0);
 act_vals = buildgrid(mdp_data, abounds, cells_action, action_quad);
 

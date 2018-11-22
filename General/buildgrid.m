@@ -1,5 +1,5 @@
 % Build grid for discretization.
-function vals = buildgrid(mdp_data, bounds,cells,quad)
+function vals = buildgrid(mdp_data, bounds, cells, quad)
 
 if quad
     bounds = signbounds.*sqrt(abs(bounds));
@@ -29,8 +29,9 @@ end
 % Convert to array.
 vals = cell2mat(vcell(:));
 
-if ~mdp_data.complex
-    % remove the grid inside the ecllipsoid
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% remove the grid inside the ecllipsoid
+if mdp_data.abounds(2,1) ~= 8
     vcell2 = {};        
     a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
     x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
@@ -41,9 +42,10 @@ if ~mdp_data.complex
             vcell2{end+1,1} = vcell{i};
         end
     end
+    
+    vals = cell2mat(vcell2);
 end
-
-vals = cell2mat(vcell2);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if quad
     vals = sign(vals).*(vals.^2);

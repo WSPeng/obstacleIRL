@@ -25,6 +25,7 @@ else
         end
 
         % Sample initial state.
+        % fixed inital state
         s = feval(strcat(mdp,'samplestates'),1,mdp_data);
 
         % Run optimization controller.
