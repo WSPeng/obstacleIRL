@@ -38,7 +38,7 @@ x0 = [0,0*ones(1,2);2.2,linspace(0,10,2)];
 
 % A set of parameters that should be defined for the simulation
 opt_sim.dt = 1; %integration time steps. which was 0.025
-opt_sim.i_max = 30+1; %maximum number of iterations
+opt_sim.i_max = 40+1; %maximum number of iterations
 opt_sim.tol = 0.001; %convergence tolerance
 opt_sim.plot = true; %enabling the animation
 opt_sim.obstacle = []; %no obstacle is defined
@@ -110,6 +110,6 @@ function y = move_costant_v(x)
     % y = [10-x(1,:);2.2-x(2,:)];
     % y = [10/size(x,2)*ones(1,size(x,2));...
     %     zeros(1,size(x,2))];
-    y = [1/2*ones(1,size(x,2));... % 10-x(1,:)
+    y = [0.3*ones(1,size(x,2));... % 10-x(1,:)
         zeros(1,size(x,2))]; % 2.2-x(2,:) 
 end

@@ -94,7 +94,10 @@ if ~isempty(example_samples)
         % Collect all points in this trajectory.
         states = robotarmcontrol(mdp_data,example_samples{i}.s,example_samples{i}.u);
         states = [example_samples{i}.s; states];
-        [ptx,pty] = robotarmfk(states,mdp_data);
+        % [ptx,pty] = robotarmfk(states,mdp_data);
+        % [ptx,pty] = pts = states(:, 1:2);
+        ptx = states(:, 1);
+        pty = states(:, 2);
         col = ones(1,3)*0.0;
         if SHOW_END_EFFECTOR
             % Plot the end effector trajectory.
@@ -159,7 +162,9 @@ if ~isempty(example_samples)
         % Collect all points in this trajectory.
         states = robotarmcontrol(mdp_data,test_samples{i}.s,test_samples{i}.u);
         states = [test_samples{i}.s; states];
-        [ptx,pty] = robotarmfk(states,mdp_data);
+        % [ptx,pty] = robotarmfk(states,mdp_data);
+        ptx = states(:, 1);
+        pty = states(:, 2);
         col = [0.3 0.3 0.7];
         if SHOW_END_EFFECTOR
             % Plot the end effector trajectory.
