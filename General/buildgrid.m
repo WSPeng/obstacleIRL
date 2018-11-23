@@ -1,5 +1,5 @@
 % Build grid for discretization.
-function vals = buildgrid(mdp_data, bounds, cells, quad)
+function vals = buildgrid(mdp_data, bounds, cells, quad, ifstate)
 
 if quad
     bounds = signbounds.*sqrt(abs(bounds));
@@ -31,14 +31,14 @@ vals = cell2mat(vcell(:));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % remove the grid inside the ecllipsoid
-if mdp_data.abounds(2,1) ~= 8
+if ifstate
     vcell2 = {};        
     a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
     x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
     for i = 1:size(vals, 1)
         x1 = vcell{i}(1);
         x2 = vcell{i}(2);
-        if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) >= 1
+        if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) >= 1*1.1 && x2<x1+4.5 && x2<14.5-x1
             vcell2{end+1,1} = vcell{i};
         end
     end

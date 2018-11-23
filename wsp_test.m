@@ -15,7 +15,7 @@ obs{1}.partition = [-pi, pi];
 obs{1}.x0 = [5;2]; % position of the obstacle
 obs{1}.th_r = 0*pi/180;
 
-obs{1}.sf = [1.2;1.2]; % the safety factor
+obs{1}.sf = [1.0;1.0]; % the safety factor
 obs{1}.rho = 1;
 
 %% drawing stream line
@@ -43,7 +43,7 @@ opt_sim.tol = 0.001; %convergence tolerance
 opt_sim.plot = true; %enabling the animation
 opt_sim.obstacle = []; %no obstacle is defined
 fig = [];
-if (true)
+if (false)
     fig(1) = figure('name','Third demo: Streamlines of the original DS','position',[100 550 560 420]);
     opt_sim.figure = fig(1);
     [x,~,~,~,~] = Simulation(x0,[],fn_handle,opt_sim); % target point empty.

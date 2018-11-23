@@ -48,9 +48,15 @@ if length(u) <= 2
     
     obs{1}.rho = rho;
     obs{1}.sf = sf;
-    
-    % get new xd from modulation
-    [xd, ~] = obs_modulation_ellipsoid(x, xd, obs, b_contour);% varargin is empty
+    x1 = x(1); x2 = x(2);
+    a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
+    x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
+    if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) >= 1*1.0
+        % get new xd from modulation
+        [xd, ~] = obs_modulation_ellipsoid(x, xd, obs, b_contour);% varargin is empty
+    else
+        xd = [0;0];
+    end
 
     % get new x
     x = x + xd*options.dt;
@@ -68,9 +74,19 @@ else
         obs{1}.sf = sf;        
         
         xd = fn_handle(x-XT);
+        x1 = x(1); x2 = x(2);
+        
+        a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
+        x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
+        if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) >= 1*1.0
+            % get new xd from modulation
+            [xd, b_contour] = obs_modulation_ellipsoid(x, xd, obs, b_contour);% varargin is empty
+        else
+            xd = [0;0];
+        end
         
         % get new xd from modulation
-        [xd, b_contour] = obs_modulation_ellipsoid(x, xd, obs, b_contour);% varargin is empty
+        %[xd, b_contour] = obs_modulation_ellipsoid(x, xd, obs, b_contour);% varargin is empty
         
         % get new x
         x = x + xd*options.dt;
@@ -107,6 +123,12 @@ if nargout >= 2
         rho = u(t,1);
         sf = u(t,2);
 
+        x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
+        if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) <= 1*1.0
+            % get new xd from modulation
+            continue
+        end  
+        
         % subtracte the center of the obstacle
         x1 = x1 - mdp_data.obs_params.opt_sim.obstacle{1}.x0(1);
         x2 = x2 - mdp_data.obs_params.opt_sim.obstacle{1}.x0(2);

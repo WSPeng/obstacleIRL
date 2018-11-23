@@ -24,8 +24,8 @@ if ~isempty(example_samples)
 end
 
 % Compute state and action grid cells.
-state_vals = buildgrid(mdp_data, sbounds, cells_state, 0);
-act_vals = buildgrid(mdp_data, abounds, cells_action, action_quad);
+state_vals = buildgrid(mdp_data, sbounds, cells_state, 0, 0);
+act_vals = buildgrid(mdp_data, abounds, cells_action, action_quad, 0);
 
 % [state_vals, act_vals] = buildgrid_obs(mdp_data, cells_action);
 

@@ -39,7 +39,7 @@ sp = linspace(0,pi*0.5,mdp_params.sensors);
 
 sbounds = [0, 2.2;...
            10, 5.5];
-abounds = [0.5, 0.9;...
+abounds = [1, 1;... % change to 1
            8.0, 1.6];
 
 % Place the objects.
