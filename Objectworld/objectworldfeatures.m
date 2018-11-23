@@ -9,7 +9,9 @@ if mdp_params.rbf_features
     % each object.
     features_pt = cell(1,length(mdp_data.objects));
     features_dyn = cell(1,1);
-    features_dyn{1} = struct('type','dist','r',-1.0,'idx',1:mdp_data.udims);
+    % features_dyn{1} = struct('type','dist','r',-1.0,'idx',1:mdp_data.udims);
+    features_dyn{1} = struct('type', 'hard','r',-100.0,'idx',1:mdp_data.udims);
+    % features_dyn = {};
     for i=1:length(mdp_data.objects)
         features_pt{i} = struct('type','cartrbf','pos',[mdp_data.objects(i).pos(:,1) mdp_data.objects(i).pos(:,end)],...
                           'width',mdp_params.feature_radius,'r',1.0);
@@ -18,13 +20,16 @@ if mdp_params.rbf_features
     % Create reward as linear combination of features. Objects where c1 = 1 are
     % assigned a reward of POSITIVE, objects where c1 = 2 are assigned NEGATIVE.
     % First create the weights.
-    theta = zeros(1,length(mdp_data.objects)+1);
-    theta(1) = mdp_params.step_cost;
+    % theta = zeros(1,length(mdp_data.objects)+1);
+    % theta(1) = mdp_params.step_cost;
+    theta = zeros(1,length(mdp_data.objects));
     for i=1:length(mdp_data.objects)
         if mdp_data.objects(i).c1 == 1
             theta(i+1) = POSITIVE;
+            %theta(i) = POSITIVE;
         elseif mdp_data.objects(i).c1 == 2
             theta(i+1) = NEGATIVE;
+            %theta(i) = NEGATIVE;
         elseif mdp_data.objects(i).c1 == 3
             theta(i+1) = POSITIVE*2.0;
             features_pt{i}.width = features_pt{i}.width/2;
@@ -103,6 +108,7 @@ end
 
 % Create the reward.
 reward = struct('type','sum','theta',theta,'features',{[features_dyn features_pt]});
+% reward = struct('type','sum','theta',theta,'features',{features_pt});
 
 % Now create seperate features if desired.
 if strcmp(mdp_params.feature_type,'simple')

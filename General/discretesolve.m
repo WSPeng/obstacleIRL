@@ -9,12 +9,13 @@ discrete_mdp = discretizemdp(mdp,mdp_data,[],test_params.cells_state,test_params
 R = zeros(discrete_mdp.states,discrete_mdp.actions);
 allstates = discrete_mdp.state_vals;
 allacts = discrete_mdp.act_vals;
-allnstates = zeros(discrete_mdp.states,mdp_data.dims,discrete_mdp.actions);
+allnstates = zeros(discrete_mdp.states,mdp_data.dims,discrete_mdp.actions); % the next state under a and s
 for a=1:discrete_mdp.actions
     for s=1:discrete_mdp.states
         allnstates(s,:,a) = feval(strcat(mdp,'control'),mdp_data,allstates(s,:),allacts(a,:));
     end
 end
+
 for a=1:discrete_mdp.actions
     block_size = 128; % TODO what is block_size? 
     block_count = ceil(discrete_mdp.states/block_size);

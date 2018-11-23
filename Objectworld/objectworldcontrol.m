@@ -51,7 +51,7 @@ if length(u) <= 2
     x1 = x(1); x2 = x(2);
     a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
     x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
-    if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) >= 1*1.0
+    if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) >= 1*1.1
         % get new xd from modulation
         [xd, ~] = obs_modulation_ellipsoid(x, xd, obs, b_contour);% varargin is empty
     else
@@ -78,7 +78,7 @@ else
         
         a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
         x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
-        if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) >= 1*1.0
+        if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) >= 1*1.1
             % get new xd from modulation
             [xd, b_contour] = obs_modulation_ellipsoid(x, xd, obs, b_contour);% varargin is empty
         else
@@ -124,8 +124,7 @@ if nargout >= 2
         sf = u(t,2);
 
         x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
-        if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) <= 1*1.0
-            % get new xd from modulation
+        if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) <= 1*1.1
             continue
         end  
         
@@ -133,24 +132,27 @@ if nargout >= 2
         x1 = x1 - mdp_data.obs_params.opt_sim.obstacle{1}.x0(1);
         x2 = x2 - mdp_data.obs_params.opt_sim.obstacle{1}.x0(2);
 
-        % calculate the lambda1 and lambda2
-        lambda1 = 1 - 1/((x1/sf/a(1))^2 + (x2/sf/a(2))^2)^(1/rho);
+        % calculate the gamma
+        gamma = (x1/sf/a(1))^2 + (x2/sf/a(2))^2;
+        
+        % calculate the lambda1 and lambda2, D
+        lambda1 = 1 - (gamma)^(-1/rho);
         lambda2 = -lambda1 + 2;
         D = [lambda1, 0; 0, lambda2];
 
-        % calculate the d_lambda
+        % calculate the d_lambda to states and actions
         % d_lambda1/d_x1
         d_lambda(1, 1, t) = 2*x1/(rho*sf^2*a(1)^2)*...
-            ((x1/sf/a(1))^2 + (x2/sf/a(2))^2)^(-1/rho-1) ;
+            (gamma)^(-1/rho-1) ;
         % d_lambda1/d_x2
         d_lambda(2, 1, t) = 2*x2/(rho*sf^2*a(2)^2)*...
-            ((x1/sf/a(1))^2 + (x2/sf/a(2))^2)^(-1/rho-1) ;
+            (gamma)^(-1/rho-1) ;
         % d_lambda1/d_rho
-        d_lambda(3, 1, t) = -((x1/sf/a(1))^2 + (x2/sf/a(2))^2)^(-1/rho)...
-            *log((x1/sf/a(1))^2 + (x2/sf/a(2))^2)*rho^(-2);
+        d_lambda(3, 1, t) = -((gamma)^2)^(-1/rho)...
+            *log(gamma)*rho^(-2);
         % d_lambda1/d_sf
-        d_lambda(4, 1, t) = -2*a(1)/rho*(x1^2+x2^2)^(-1/rho)...
-            *(sf*a(1))^(2/rho-1);
+        d_lambda(4, 1, t) = -2/rho*((x1/a(1))^2+(x2/a(2))^2)^(-1/rho)...
+            *(sf)^(2/rho-1);
 
         % d_lambda2/d_x1
         d_lambda(1, 2, t) = -d_lambda(1, 1, t);
@@ -171,11 +173,11 @@ if nargout >= 2
         % d_E/d_x1
         d_E(:,:,1) = 2/sf^2*[1/a(1)^2, 0; 0 -1/a(1)^2];
         % d_E/d_x2
-        d_E(:,:,2) = 2/sf^2*[0, 1/a(2)^2; 1/a(2)^2 0];
+        d_E(:,:,2) = 2/sf^2*[0, 1/a(2)^2; 1/a(2)^2, 0];
         % d_E/d_rho
         d_E(:,:,3) = 0;
         %d_E/d_sf
-        d_E(:,:,4) = -2/sf*E;
+        d_E(:,:,4) = -4/sf^3*E;
 
         % d_invE/d_x1
         d_invE(:,:,1) = -2*x1/a(1)^4*(const_1)^(-2)*E + 1/const_1*d_E(:,:,1);
@@ -184,20 +186,20 @@ if nargout >= 2
         % d_invE/d_rho
         d_invE(:,:,3) = 0; 
         % d_invE/d_sf
-        d_invE(:,:,4) = -2/sf*1/const_1*E;
+        d_invE(:,:,4) = -4/sf^3*1/const_1*E;
 
         % d_D/d_x1
         d_D(:,:,1) = [d_lambda(1,1,t), 0; 
-                    0 d_lambda(1,2,t)];
+                      0 d_lambda(1,2,t)];
         % d_D/d_x2
         d_D(:,:,2) = [d_lambda(2,1,t), 0; 
-                    0 d_lambda(2,2,t)];
+                      0 d_lambda(2,2,t)];
         % d_D/d_rho
         d_D(:,:,3) = [d_lambda(3,1,t), 0; 
-                    0 d_lambda(3,2,t)];
+                      0 d_lambda(3,2,t)];
         % d_D/d_sf
         d_D(:,:,4) = [d_lambda(4,1,t), 0; 
-                    0 d_lambda(4,2,t)];
+                      0 d_lambda(4,2,t)];
 
         % together
         % x1 and x2 / x1
@@ -211,14 +213,14 @@ if nargout >= 2
             E*D*d_invE(:,:,4)*dyn;
 
         % make things clear
-        dx1_dx1 = dM_dx1(1) + 1;
-        dx2_dx1 = dM_dx1(2);
-        dx1_dx2 = dM_dx2(1);
-        dx2_dx2 = dM_dx2(2) + 1;
-        dx1_drho = dM_drho(1);
-        dx2_drho = dM_drho(2);
-        dx1_dsf = dM_dsf(1);
-        dx2_dsf = dM_dsf(2);
+        dx1_dx1 = dM_dx1(1)*options.dt + 1;
+        dx2_dx1 = dM_dx1(2)*options.dt;
+        dx1_dx2 = dM_dx2(1)*options.dt;
+        dx2_dx2 = dM_dx2(2)*options.dt + 1;
+        dx1_drho = dM_drho(1)*options.dt;
+        dx2_drho = dM_drho(2)*options.dt;
+        dx1_dsf = dM_dsf(1)*options.dt;
+        dx2_dsf = dM_dsf(2)*options.dt;
 
         % pack together
         % A is derivative with respect to previous state

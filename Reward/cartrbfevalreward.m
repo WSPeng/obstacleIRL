@@ -8,8 +8,7 @@ T = size(u,1);
 Du = size(u,2);
 Dx = size(states,2);
 
-% Convert states to Cartesian space. Here the states is the position given
-% by Simulation function
+% Here the states is the position given by Simulation function
 pts = states;
 
 % Compute distances.

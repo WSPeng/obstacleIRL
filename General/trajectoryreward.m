@@ -1,6 +1,7 @@
 % Return the reward obtained along trajectory determined by given inputs,
 % as well as the gradient of the reward with respect to those inputs.
 function [val,grad] = trajectoryreward(u,s,mdp_data,mdp,reward)
+% need graident for line search.
 
 % Reshape.
 u = reshape(u,size(u,1)/mdp_data.udims,mdp_data.udims);
