@@ -1,6 +1,9 @@
 % Evaluate controls on the objectworld environment and return gradients and
 % Hessians.
-function [states,A,B,invB,dxdu,d2xdudu] = objectworldcontrol(mdp_data,x,u)
+function [states,A,B,invB,dxdu,d2xdudu] = objectworldcontrol(mdp_data, x, u)
+% INPUT: 
+%   x 1x2 
+%   u 1x2 or nx2
 % note, u is on rho and sf space. -> action space
 % the x is cartisian space, -> state space 
 
@@ -12,7 +15,7 @@ end
 obs = options.obstacle;
 
 for n=1:length(obs)
-    x_obs{n} = obs{n}.x0;
+    % x_obs{n} = obs{n}.x0;
     if ~isfield(obs{n},'extra')
         obs{n}.extra.ind = 2;
         obs{n}.extra.C_Amp = 0.01;
@@ -25,19 +28,20 @@ b_contour = 0;
 XT = [0;0]; % the target point, % dosen't matter at all
 
 % unpack the variable from state
+xi = x;
 states = x;
 x = x';
 fn_handle = mdp_data.obs_params.fn_handle;
-xd_obs = [0;0];
+% xd_obs = [0;0]; % the velocity of obstacle
 
 % Constants.
 Dx = mdp_data.dims;
 Du = mdp_data.udims;
 T = size(u,1);
 
-if length(u) <= 2 % here to differentiate between only 1 input and a series input
-    
-    xd = fn_handle(x-XT);
+% here to differentiate between only 1 input and a series input
+if length(u) <= 2     
+    xd = fn_handle(x-XT); % xd : 2x1
     
     rho = u(:,1);
     sf = u(:,2);
@@ -57,7 +61,6 @@ if length(u) <= 2 % here to differentiate between only 1 input and a series inpu
 else
   % if have series of inputs
     for k = 1:length(u)
-        
         rho = u(k,1);
         sf = u(k,2);
     
@@ -97,7 +100,7 @@ if nargout >= 2
     dyn = [0.3;0]; % related to dynamics
     a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
 
-    states_ = [x';states]; % for the for loop
+    states_ = [xi(1,:);states]; % for the for loop
     for t = 1:T
         x1 = states_(t, 1);
         x2 = states_(t, 2);
@@ -109,7 +112,7 @@ if nargout >= 2
         x2 = x2 - mdp_data.obs_params.opt_sim.obstacle{1}.x0(2);
 
         % calculate the lambda1 and lambda2
-        lambda1 = 1 - ((x1/sf/a(1))^2 + (x2/sf/a(2))^2)^(1/rho);
+        lambda1 = 1 - 1/((x1/sf/a(1))^2 + (x2/sf/a(2))^2)^(1/rho);
         lambda2 = -lambda1 + 2;
         D = [lambda1, 0; 0, lambda2];
 
@@ -199,7 +202,7 @@ if nargout >= 2
         % A is derivative with respect to previous state
         % B is derivative with respect to action
         A(:,:,t) = [dx1_dx1, dx1_dx2;
-                    dx2_dx1, dx2_dx2+1];
+                    dx2_dx1, dx2_dx2];
 
         % B(:,:,t) = [1,0; 0,1; 1,0; 0,1];
         B(:,:,t) = [dx1_drho, dx1_dsf;
