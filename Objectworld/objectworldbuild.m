@@ -29,6 +29,9 @@ for i=1:mdp_params.sensors
     sensor_basis(:,i) = [cos(angle); sin(angle)];
 end
 
+motor_basis = eye(2);
+sensor_basis = eye(2);
+
 % Compute pseudoinverse of sensor basis.
 sensor_pseudoinverse = sensor_basis'*inv(sensor_basis*sensor_basis');
 
