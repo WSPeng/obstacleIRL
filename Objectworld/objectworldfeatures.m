@@ -10,7 +10,7 @@ if mdp_params.rbf_features
     features_pt = cell(1,length(mdp_data.objects));
     features_dyn = cell(1,1);
     % features_dyn{1} = struct('type','dist','r',-1.0,'idx',1:mdp_data.udims);
-    features_dyn{1} = struct('type', 'hard','r',-1000.0,'idx',1:mdp_data.udims);
+    features_dyn{1} = struct('type', 'hard','r',-10000000.0,'idx',1:mdp_data.udims);
     % features_dyn = {};
     for i=1:length(mdp_data.objects)
         features_pt{i} = struct('type','cartrbf','pos',[mdp_data.objects(i).pos(:,1) mdp_data.objects(i).pos(:,end)],...
