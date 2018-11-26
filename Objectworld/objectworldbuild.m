@@ -81,7 +81,7 @@ elseif mdp_params.fixed_pattern == 2
     objects(i) = struct('pos',[1.0 0.35]*mdp_params.size,'c1',5,'c2',1);i=i+1;
 elseif mdp_params.fixed_pattern == 3
     objects(1) = struct('pos',[0.5 0.22]*mdp_params.size,'c1',2,'c2',1);
-    objects(2) = struct('pos',[-0.1 0.5]*mdp_params.size,'c1',2,'c2',1);
+    objects(2) = struct('pos',[0 0.22]*mdp_params.size,'c1',2,'c2',1); % was 0.1 0.5
     objects(3) = struct('pos',[1 0.5]*mdp_params.size,'c1',2,'c2',1);
 else
     % Place objects at random.

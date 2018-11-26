@@ -1,8 +1,5 @@
 % Run example tests on objectworld with fixed "flower petal" reward.
 function objectworldtest(a,s,r,example_optimal,test_file_name)
-% INPUT
-%   example_optimal : 0 or 1 used in optimizetrajectory
-%   
 
 % 4 algorithm, 5 tests, 8 restarts
 
@@ -70,7 +67,7 @@ mdp_param_names = {'4','8','16','32','64'};
 mdp_params = {struct(...
     'sensors',2,...
     'motors',2,...
-    'seed',2,...
+    'seed',1,...
     'feature_type','grid',...
     'obs_params', obs_params,...
     'fixed_pattern',3,...
@@ -83,7 +80,7 @@ mdp_params = repmat(mdp_params,1,length(mdp_param_names));
 % Prepare test parameters.
 test_params = {setdefaulttestparams(test_params)};
 test_params = repmat(test_params,1,length(mdp_param_names));
-test_params{1}.training_samples = 4; % was 4
+test_params{1}.training_samples = 1; % was 4
 test_params{2}.training_samples = 8;
 test_params{3}.training_samples = 16;
 test_params{4}.training_samples = 32;

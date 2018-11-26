@@ -10,24 +10,27 @@ Dx = size(states,2);
 % Compute values.
 r = zeros(T,1);
 
-if nargout >= 2,
+if nargout >= 2
     g = zeros(T,Du);
-end;
-if nargout >= 3,
+end
+
+if nargout >= 3
     drdu = zeros(T,Du);
     d2rdudu = zeros(T,Du,Du);
-    for t=1:T,
+    for t=1:T
         d2rdudu(t,:,:) = -eye(Du);
-    end;
-end;
-if nargout >= 5,
+    end
+end
+
+if nargout >= 5
     drdx = zeros(T,Dx);
     d2rdxdx = zeros(T,Dx,Dx);
-end;
-if nargout >= 7,
+end
+
+if nargout >= 7
     gfull = zeros(T,T*Du);
     Hfull = zeros(T,T*Du,T*Du);
-    for t=1:T,
+    for t=1:T
         Hfull(t,(0:(Du-1))*T + t,(0:(Du-1))*T + t) = -eye(Du);
-    end;
-end;
+    end
+end

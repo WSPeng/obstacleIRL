@@ -73,7 +73,7 @@ else
         obs{1}.rho = rho;
         obs{1}.sf = sf;        
         
-        xd = fn_handle(x-XT);
+        xd = fn_handle(x-XT);  % x is the location at n-1 time
         x1 = x(1); x2 = x(2);
         
         a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
@@ -117,6 +117,7 @@ if nargout >= 2
     a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
 
     states_ = [xi(1,:);states]; % for the for loop
+    % states_ = states;
     for t = 1:T
         x1 = states_(t, 1);
         x2 = states_(t, 2);
@@ -148,10 +149,9 @@ if nargout >= 2
         d_lambda(2, 1, t) = 2*x2/(rho*sf^2*a(2)^2)*...
             (gamma)^(-1/rho-1) ;
         % d_lambda1/d_rho
-        d_lambda(3, 1, t) = -((gamma)^2)^(-1/rho)...
-            *log(gamma)*rho^(-2);
+        d_lambda(3, 1, t) = -(gamma)^(-1/rho)*log(gamma)*rho^(-2);
         % d_lambda1/d_sf
-        d_lambda(4, 1, t) = -2/rho*((x1/a(1))^2+(x2/a(2))^2)^(-1/rho)...
+        d_lambda(4, 1, t) = -2/rho*(gamma)^(-1/rho)...
             *(sf)^(2/rho-1);
 
         % d_lambda2/d_x1
@@ -232,9 +232,19 @@ if nargout >= 2
         B(:,:,t) = [dx1_drho, dx1_dsf;
                     dx2_drho, dx2_dsf];
 
+        % move 1 more back
+%         if i > 1
+%             AA(:,:,t) = A(:,:,t-1);
+%             BB(:,:,t) = B(:,:,t-1);
+%         else
+%             AA(:,:,t) = ones(2,2);
+%             BB(:,:,t) = ones(2,2);
+%         end
         invB(:,:,t) = pinv(B(:,:,t));
     end
 
+    % A = AA;B = BB;
+    
     if nargout >= 5
         % Now build the Jacobian out of these matrices.
         dxdu = zeros(Du*T,Dx*T);
