@@ -1,6 +1,10 @@
 % Evaluate controls on the objectworld environment and return gradients and
 % Hessians.
 function [states,A,B,invB,dxdu,d2xdudu] = objectworldcontrol(mdp_data, x, u)
+T = size(u,1);
+x = [0,2.2];
+u = [1.6*ones(T,1), 3*ones(T,1)];
+
 % INPUT: 
 %   x 1x2 
 %   u 1x2 or nx2
