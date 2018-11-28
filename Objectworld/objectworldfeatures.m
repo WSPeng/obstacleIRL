@@ -4,13 +4,13 @@ function [reward,features_pt,features_dyn] = objectworldfeatures(mdp_params,mdp_
 POSITIVE = 10;
 NEGATIVE = -15;
 
-if mdp_params.rbf_features
+if mdp_params.rbf_features == 1
     % First create the features, which for now are RBF functions centered at
     % each object.
     features_pt = cell(1,length(mdp_data.objects));
     features_dyn = cell(1,1);
     % features_dyn{1} = struct('type','dist','r',-1.0,'idx',1:mdp_data.udims);
-    features_dyn{1} = struct('type', 'hard','r',-10000000.0,'idx',1:mdp_data.udims);
+    features_dyn{1} = struct('type', 'hard','r',-1000.0,'idx',1:mdp_data.udims);
     % features_dyn = {};
     for i=1:length(mdp_data.objects)
         features_pt{i} = struct('type','cartrbf','pos',[mdp_data.objects(i).pos(:,1) mdp_data.objects(i).pos(:,end)],...
@@ -40,6 +40,33 @@ if mdp_params.rbf_features
             theta(i+1) = POSITIVE*1.5;
             features_pt{i}.width = features_pt{i}.width/2;
             %}
+        end
+    end
+elseif mdp_params.rbf_features == 2
+    % 1 rbf and one dimensional reward
+    features_pt = cell(1,1);
+    features_dyn = cell(1,1);
+    % features_dyn{1} = struct('type','dist','r',-1.0,'idx',1:mdp_data.udims);
+    % features_dyn{1} = struct('type', 'hard','r',-10000000.0,'idx',1:mdp_data.udims);
+    features_dyn{1} = struct('type', 'hard','r',-10000000.0,'idx',1:mdp_data.udims);
+    features_pt{1} = struct('type','cartrbf','pos',[mdp_data.objects(1).pos(:,1), mdp_data.objects(1).pos(:,end)],...
+                          'width',0.5,'r',2.0);
+    % features_pt{2} = struct('type','cartrbf','pos',[mdp_data.objects(2).pos(:,1), mdp_data.objects(2).pos(:,end)],...
+    %                       'width',1.0,'r',2.0);
+    % features_pt{3} = struct('type','cartrbf','pos',[mdp_data.objects(3).pos(:,1), mdp_data.objects(3).pos(:,end)],...
+    %                       'width',1.0,'r',2.0);
+    features_pt{length(features_pt)+1} = struct('type','onedim','direction','x','r',1.0,'width',0.05);
+    features_pt{length(features_pt)+1} = struct('type','onedim','direction','y','r',1.0,'width',0.5);
+     
+    theta = zeros(1,length(features_pt)+1);
+    theta(1) = mdp_params.step_cost; % dist
+    for i=1:length(mdp_data.objects)
+        if mdp_data.objects(i).c1 == 1
+            theta(i+1) = POSITIVE;
+        elseif mdp_data.objects(i).c1 == 2
+            theta(i+1) = NEGATIVE;
+        else
+            theta(i+1) = mdp_data.objects(i).c1;
         end
     end
 else
@@ -149,5 +176,15 @@ elseif strcmp(mdp_params.feature_type,'grid')
                               'width',mdp_params.feature_radius,'r',1.0);    
     features_pt{3} = struct('type','cartrbf','pos',[1 0.5]*mdp_params.size,...
                               'width',mdp_params.feature_radius,'r',1.0);                          
-
+elseif strcmp(mdp_params.feature_type,'obs')
+    % obstacle feature
+    features_pt = cell(1,1);
+    features_pt{1} = struct('type','cartrbf','pos',[mdp_data.objects(1).pos(:,1), mdp_data.objects(1).pos(:,end)],...
+                          'width',0.5,'r',2.0);
+    % features_pt{2} = struct('type','cartrbf','pos',[mdp_data.objects(2).pos(:,1), mdp_data.objects(2).pos(:,end)],...
+    %                      'width',2.0,'r',2.0);
+    %features_pt{3} = struct('type','cartrbf','pos',[mdp_data.objects(3).pos(:,1), mdp_data.objects(3).pos(:,end)],...
+    %                      'width',2.0,'r',2.0);
+    features_pt{length(features_pt)+1} = struct('type','onedim','direction','x','r',1.0,'width',0.05);
+    features_pt{length(features_pt)+1} = struct('type','onedim','direction','y','r',1.0,'width',0.5);
 end

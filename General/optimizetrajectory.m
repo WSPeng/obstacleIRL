@@ -13,7 +13,7 @@ options.MaxFunEvals = 1000;
 options.display = 'on';
 options.TolX = 1.0e-16;
 options.TolFun = 1.0e-8;
-options.Display = 'off';
+options.Display = 'on';
 %options.DerivativeCheck = 'on';
 
 if size(restarts,2) > 1

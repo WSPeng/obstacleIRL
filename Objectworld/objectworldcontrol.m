@@ -1,15 +1,28 @@
 % Evaluate controls on the objectworld environment and return gradients and
 % Hessians.
 function [states,A,B,invB,dxdu,d2xdudu] = objectworldcontrol(mdp_data, x, u)
-T = size(u,1);
-x = [0,2.2];
-u = [1.6*ones(T,1), 3*ones(T,1)];
+% T = size(u,1);
+% x = [0,2.2];
+% u = [1.6*ones(T,1), 3*ones(T,1)];
 
 % INPUT: 
 %   x 1x2 
 %   u 1x2 or nx2
 % note, u is on rho and sf space. -> action space
 % the x is cartisian space, -> state space 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Add hard constraint
+for tt = 1:length(u)
+    if u(tt,1)<0.9
+        u(tt,1) = 0.9;
+    end
+    if u(tt,2)<0.9
+        u(tt,2) = 0.9;
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 if isempty(mdp_data.obs_params.opt_sim)
     options = check_options();
@@ -128,17 +141,18 @@ if nargout >= 2
         rho = u(t,1);
         sf = u(t,2);
 
-        x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
-        if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) <= 1*1.1
-            continue
-        end  
+        % x0 = mdp_data.obs_params.opt_sim.obstacle{1}.x0;
+        % if (((x1-x0(1))/a(1))^2 + ((x2-x0(2))/a(2))^2) <= 1*1.1
+        %     continue
+        % end  
         
         % subtracte the center of the obstacle
         x1 = x1 - mdp_data.obs_params.opt_sim.obstacle{1}.x0(1);
         x2 = x2 - mdp_data.obs_params.opt_sim.obstacle{1}.x0(2);
 
         % calculate the gamma
-        gamma = (x1/sf/a(1))^2 + (x2/sf/a(2))^2;
+        % gamma = (x1/sf/a(1))^2 + (x2/sf/a(2))^2;
+        gamma = (x1/sf)^2 + (x2/sf)^2;
         
         % calculate the lambda1 and lambda2, D
         lambda1 = 1 - (gamma)^(-1/rho);
@@ -147,16 +161,20 @@ if nargout >= 2
 
         % calculate the d_lambda to states and actions
         % d_lambda1/d_x1
-        d_lambda(1, 1, t) = 2*x1/(rho*sf^2*a(1)^2)*...
-            (gamma)^(-1/rho-1) ;
+%         d_lambda(1, 1, t) = 2*x1/(rho*sf^2*a(1)^2)*...
+%             (gamma)^(-1/rho-1) ;
+        d_lambda(1, 1, t) = 2*x1/(rho*sf^2)*(gamma)^(-1/rho-1) ;
+
         % d_lambda1/d_x2
-        d_lambda(2, 1, t) = 2*x2/(rho*sf^2*a(2)^2)*...
-            (gamma)^(-1/rho-1) ;
+%         d_lambda(2, 1, t) = 2*x2/(rho*sf^2*a(2)^2)*...
+%             (gamma)^(-1/rho-1) ;
+        d_lambda(2, 1, t) = 2*x2/(rho*sf^2)*(gamma)^(-1/rho-1) ;
         % d_lambda1/d_rho
         d_lambda(3, 1, t) = -(gamma)^(-1/rho)*log(gamma)*rho^(-2);
         % d_lambda1/d_sf
-        d_lambda(4, 1, t) = -2/rho*(gamma)^(-1/rho)...
-            *(sf)^(2/rho-1);
+%         d_lambda(4, 1, t) = -2/rho*((x1/a(1))^2 + (x2/a(2))^2)^(-1/rho)...  % it is not gamma inside..
+%             *(sf)^(2/rho-1);
+        d_lambda(4, 1, t) = -2/rho*(x1^2 + x2^2)^(-1/rho)*(sf)^(2/rho-1);
 
         % d_lambda2/d_x1
         d_lambda(1, 2, t) = -d_lambda(1, 1, t);
@@ -168,29 +186,45 @@ if nargout >= 2
         d_lambda(4, 2, t) = -d_lambda(4, 1, t);
 
         % some constant
-        E = 2/sf^2*[x1/a(1)^2, x2/a(2)^2;...
-                    x2/a(2)^2, -x1/a(1)^2]; % with the front constant related to sf..
-        const_1 = (x1^2/a(1)^4 + x2^2/a(2)^4);
-        invE = 1/const_1*E;
+%         E = 2/sf^2*[x1/a(1)^2, x2/a(2)^2;...
+%                     x2/a(2)^2, -x1/a(1)^2]; % with the front constant related to sf..
+        E = 2/sf^2*[x1, x2;...
+                    x2, -x1];
+
+%        const_1 = (x1^2/a(1)^4 + x2^2/a(2)^4);
+        const_1 = (x1^2 + x2^2);
+        
+%         invE = 1/const_1*sf^2/2*[x1/a(1)^2, x2/a(2)^2;...  % the inverse, remember inverse the constant multiplied!
+%                                  x2/a(2)^2, -x1/a(1)^2];
+        invE = 1/const_1*sf^2/2*[x1, x2;...  % the inverse, remember inverse the constant multiplied!
+                                 x2, -x1];
 
         % compute the derivative in matrix multiplcation form
         % d_E/d_x1
-        d_E(:,:,1) = 2/sf^2*[1/a(1)^2, 0; 0 -1/a(1)^2];
+%         d_E(:,:,1) = 2/sf^2*[1/a(1)^2, 0; 0 -1/a(1)^2];
+        d_E(:,:,1) = 2/sf^2*[1, 0; 0 -1];
         % d_E/d_x2
-        d_E(:,:,2) = 2/sf^2*[0, 1/a(2)^2; 1/a(2)^2, 0];
+%         d_E(:,:,2) = 2/sf^2*[0, 1/a(2)^2; 1/a(2)^2, 0];
+        d_E(:,:,2) = 2/sf^2*[0, 1; 1, 0];
         % d_E/d_rho
         d_E(:,:,3) = 0;
         %d_E/d_sf
-        d_E(:,:,4) = -4/sf^3*E;
+        d_E(:,:,4) = -2/sf*E; % 2/sf^2* is already included
 
         % d_invE/d_x1
-        d_invE(:,:,1) = -2*x1/a(1)^4*(const_1)^(-2)*E + 1/const_1*d_E(:,:,1);
+%         d_invE(:,:,1) = -2*x1/a(1)^4*(const_1)^(-2)*[x1/a(1)^2, x2/a(2)^2; ...
+%             x2/a(2)^2, -x1/a(1)^2]*sf^2/2 + 1/const_1*sf^2/2*[1/a(1)^2, 0; 0 -1/a(1)^2];
+        d_invE(:,:,1) = -2*x1*(const_1)^(-2)*[x1, x2; ...
+            x2, -x1]*sf^2/2 + 1/const_1*sf^2/2*[1, 0; 0 -1];
         % d_invE/d_x2
-        d_invE(:,:,2) = -2*x2/a(2)^4*(const_1)^(-2)*E + 1/const_1*d_E(:,:,2);
+        % d_invE(:,:,2) = -2*x2/a(2)^4*(const_1)^(-2)*E + 1/const_1*d_E(:,:,2);
+%         d_invE(:,:,2) = -2*x2/a(2)^4*(const_1)^(-2)*[x1/a(1)^2, x2/a(2)^2; ...
+%             x2/a(2)^2, -x1/a(1)^2]*sf^2/2 + 1/const_1*sf^2/2*[0, 1/a(2)^2; 1/a(2)^2, 0];
+        d_invE(:,:,2) = -2*x2*(const_1)^(-2)*[x1, x2; x2, -x1]*sf^2/2 + 1/const_1*sf^2/2*[0, 1; 1, 0];
         % d_invE/d_rho
         d_invE(:,:,3) = 0; 
         % d_invE/d_sf
-        d_invE(:,:,4) = -4/sf^3*1/const_1*E;
+        d_invE(:,:,4) = 1/sf*2*invE;
 
         % d_D/d_x1
         d_D(:,:,1) = [d_lambda(1,1,t), 0; 
@@ -267,6 +301,8 @@ end
 
 % Now compute the Hessian.
 if nargout >= 6
+    
+    
     % First compute the Hessian of points to thrust.
     %{
     d2pdtdt = zeros(2*T,2*T,2*T);
@@ -283,4 +319,5 @@ if nargout >= 6
     % TODO: if for whatever reason this is nonzero, it should be
     % implemented here.
     d2xdudu = zeros(Du*T,Du*T,Dx*T);
+    
 end
