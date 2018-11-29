@@ -13,17 +13,42 @@ function [states,A,B,invB,dxdu,d2xdudu] = objectworldcontrol(mdp_data, x, u)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add hard constraint
-for tt = 1:length(u)
-    if u(tt,1)<0.9
-        u(tt,1) = 0.9;
-    end
-    if u(tt,2)<0.9
-        u(tt,2) = 0.9;
-    end
+% for tt = 1:length(u)
+%     if u(tt,1)<0.9
+%         u(tt,1) = 0.9;
+%     end
+%     if u(tt,2)<0.9
+%         u(tt,2) = 0.9;
+%     end
+% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ReLU
+relu = 0;
+if relu
+    uu = u;
+    du = ones(length(u),2);
+    boundsf = 0.9;
+    u(uu(:,1)<0.1,1) = 0.1;
+    u(uu(:,2)<boundsf,2) = boundsf;
+    
+    du(uu(:,1)<0.1,1) = 0;
+    du(uu(:,1)>=0.1,1) = 1;
+    du(uu(:,2)<boundsf,2) = 0;
+    du(uu(:,2)>=boundsf,2) = 1;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% soft ReLU
+softrelu = 1;
+if softrelu
+    uu = u;
+    du = ones(length(u),2);
+    u = log(1+exp(uu))+0.9;
+    du = 1./(1+exp(-uu)); % 
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% softmax, tanh
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if isempty(mdp_data.obs_params.opt_sim)
     options = check_options();
 else
@@ -255,10 +280,11 @@ if nargout >= 2
         dx2_dx1 = dM_dx1(2)*options.dt;
         dx1_dx2 = dM_dx2(1)*options.dt;
         dx2_dx2 = dM_dx2(2)*options.dt + 1;
-        dx1_drho = dM_drho(1)*options.dt;
-        dx2_drho = dM_drho(2)*options.dt;
-        dx1_dsf = dM_dsf(1)*options.dt;
-        dx2_dsf = dM_dsf(2)*options.dt;
+        % derivative wrt actions
+        dx1_drho = dM_drho(1)*options.dt*du(t,1);
+        dx2_drho = dM_drho(2)*options.dt*du(t,1);
+        dx1_dsf = dM_dsf(1)*options.dt*du(t,2);
+        dx2_dsf = dM_dsf(2)*options.dt*du(t,2);
 
         % pack together
         % A is derivative with respect to previous state

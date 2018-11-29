@@ -22,18 +22,18 @@ Dx = size(states,2);
 
 % This reward add hard constraint for rho and sf, which are control inputs
 % r = reward.r * sum(u(:,reward.idx).^2,2);
-a = 5;
+a = 1;
 upper_sf = 3.0;
-l1 = log(u(:,1)-0.9) + log(-u(:,1)+8);
-l2 = log(u(:,2)-0.9) + log(-u(:,2)+2.0); 
+l1 = log(u(:,1)-0.9);% + log(-u(:,1)+8);
+l2 = log(u(:,2)-0.9);% + log(-u(:,2)+upper_sf); 
 r = 1/reward.r * (l1 + l2*a); 
 
 if nargout >= 2
     % Compute gradient with respect to controls.
     g = zeros(T,Du);
     % g(:,reward.idx) = 2.0 * reward.r * u(:,reward.idx);
-    g(:,1) = 1/reward.r * ((u(:,1)-0.9).^(-1) - (-u(:,1)+8).^(-1));
-    g(:,2) = 1/reward.r * a * ((u(:,2)-0.9).^(-1) - (-u(:,2)+upper_sf).^(-1));
+    g(:,1) = 1/reward.r * ((u(:,1)-0.9).^(-1));% - (-u(:,1)+8).^(-1));
+    g(:,2) = 1/reward.r * a * ((u(:,2)-0.9).^(-1));% - (-u(:,2)+upper_sf).^(-1));
 end
 
 if nargout >= 3
@@ -45,8 +45,10 @@ if nargout >= 3
     mask(reward.idx,1) = 1;
     for t=1:T
         % d2rdudu(t,:,:) = reward.r * 2.0 * diag(mask);
-        d2rdudu(t,:,:) = 1/reward.r * [-((u(t,1)-0.9).^(-2)+(-u(t,1)+8).^(-2)), 0;...
-                                        0, -a* ((u(t,2)-0.9).^(-2)+(-u(t,2)+upper_sf).^(-2))];
+%         d2rdudu(t,:,:) = 1/reward.r * [-((u(t,1)-0.9).^(-2)+(-u(t,1)+8).^(-2)), 0;...
+%                                         0, -a* ((u(t,2)-0.9).^(-2)+(-u(t,2)+upper_sf).^(-2))];
+        d2rdudu(t,:,:) = 1/reward.r * [-((u(t,1)-0.9).^(-2)), 0;...
+                                       0, -a*(u(t,2)-0.9).^(-2)];
     end
 end
 
