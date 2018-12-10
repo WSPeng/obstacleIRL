@@ -1,19 +1,6 @@
 function [r,g,drdu,d2rdudu,drdx,d2rdxdx,gfull,Hfull] = ...
     onedimevalreward(reward,mdp_data,x,u,states,A,B,dxdu,d2xdudu)
 
-% if isempty(x)
-%     % If there is no initial state, this is just a visualization call.
-%     r = 0;
-%     g = [];
-%     drdu = [];
-%     d2rdudu = [];
-%     drdx = [];
-%     d2rdxdx = [];
-%     gfull = [];
-%     Hfull = [];
-%     return;
-% end
-
 % Get constants.
 T = size(u,1);
 Du = size(u,2);

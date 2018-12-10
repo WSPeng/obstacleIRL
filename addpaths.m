@@ -49,3 +49,11 @@ addpath Utilities/plot2svg
 addpath FastHess
 addpath Test
 addpath Objectworld
+
+addpath Reward
+
+addpath General
+addpath Laplace
+addpath MaxEnt
+
+addpath Auglag
