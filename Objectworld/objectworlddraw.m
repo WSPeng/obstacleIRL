@@ -29,7 +29,7 @@ hold on;
 
 % Draw the reward function.
 % Create regular samples.
-STEP_SIZE = 0.2;
+STEP_SIZE = 0.2*100;
 x = -HMARGIN:STEP_SIZE:(mdp_data.bounds(1)+HMARGIN);
 y = -VMARGIN:STEP_SIZE:(mdp_data.bounds(2)+VMARGIN);
 [X,Y] = meshgrid(x,y);

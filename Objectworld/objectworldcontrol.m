@@ -1,6 +1,7 @@
 % Evaluate controls on the objectworld environment and return gradients and
 % Hessians.
-function [states,A,B,invB,dxdu,d2xdudu] = objectworldcontrol(mdp_data, x, u)
+function [states, A ,B, invB, dxdu, d2xdudu] = objectworldcontrol(mdp_data, x, u)
+
 % T = size(u,1);
 % x = [0,2.2];
 % u = [1.6*ones(T,1), 3*ones(T,1)];
@@ -23,6 +24,8 @@ function [states,A,B,invB,dxdu,d2xdudu] = objectworldcontrol(mdp_data, x, u)
 % end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ReLU
+
+du = ones(length(u),2);
 relu = 0;
 if relu
     uu = u;
@@ -38,12 +41,11 @@ if relu
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % soft ReLU
-softrelu = 1;
+softrelu = 0;
 if softrelu
     uu = u;
-    du = ones(length(u),2);
-    u = log(1+exp(uu))+0.9;
-    du = 1./(1+exp(-uu)); % 
+    u = log(1 + exp(uu-1)) + 1.0; % 0.9
+    du = 1./(1 + exp(-uu+1));  
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % softmax, tanh
@@ -67,7 +69,7 @@ end
 
 b_contour = 0;
 
-XT = [0;0]; % the target point, % dosen't matter at all
+XT = [0;0]; % the target point, % dosen't matter
 
 % unpack the variable from state
 xi = x;
@@ -155,10 +157,11 @@ if nargout >= 2
     invB = zeros(Du,Dx,T);
 
     % some constant 
-    dyn = [0.3;0]; % related to dynamics
+    dyn = [0.3*obs{1}.x0(1)*2; 0]; % related to dynamics was [0.3 0]
     a = mdp_data.obs_params.opt_sim.obstacle{1}.a;
 
     states_ = [xi(1,:);states]; % for the for loop
+    
     % states_ = states;
     for t = 1:T
         x1 = states_(t, 1);
@@ -280,6 +283,7 @@ if nargout >= 2
         dx2_dx1 = dM_dx1(2)*options.dt;
         dx1_dx2 = dM_dx2(1)*options.dt;
         dx2_dx2 = dM_dx2(2)*options.dt + 1;
+        
         % derivative wrt actions
         dx1_drho = dM_drho(1)*options.dt*du(t,1);
         dx2_drho = dM_drho(2)*options.dt*du(t,1);
@@ -296,6 +300,9 @@ if nargout >= 2
         B(:,:,t) = [dx1_drho, dx1_dsf;
                     dx2_drho, dx2_dsf];
 
+        if any(any(isnan(B(:,:,t)))) || any(any(isinf(B(:,:,t))))
+            fprintf(1,'!');
+        end
         % move 1 more back
 %         if i > 1
 %             AA(:,:,t) = A(:,:,t-1);
@@ -312,12 +319,12 @@ if nargout >= 2
     if nargout >= 5
         % Now build the Jacobian out of these matrices.
         dxdu = zeros(Du*T,Dx*T);
-        uidx = (0:T:(T*(Du-1)));
-        xidx = (0:T:(T*(Dx-1)));
-        for c=1:T
+        uidx = 0: T: (T*(Du-1)); % multi 
+        xidx = 0: T: (T*(Dx-1));
+        for c = 1:T
             % First, compute the top part of this block row.
-            for r=1:(c-1)
-                dxdu(r + uidx, c + xidx) = dxdu(r + uidx, (c-1) + xidx)*A(:,:,c)';
+            for r = 1:(c-1)
+                dxdu(r + uidx, c + xidx) = dxdu(r + uidx, (c-1) + xidx) * A(:,:,c)';
             end
             % Now write the diagonal block.
             dxdu(c + uidx, c + xidx) = B(:,:,c)';

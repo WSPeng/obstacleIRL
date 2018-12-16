@@ -25,10 +25,25 @@ surf(X,Y,r)
 
 
 %% soft relu
-% figure
-% x = -10:0.1:10;
-% y = log(1+exp(x));
-% plot(x,y)
-% hold on
-% der = 1./(1+exp(-x));
-% plot(x,der)
+figure
+x = -2:0.1:10;
+straight = 1:0.1:10;
+plot(straight, straight, '-.')
+hold on
+y = log(1 + exp(x-1)) + 1;
+plot(x,y)
+
+der = 1./(1 + exp(-x+1));
+plot(x,der)
+
+%% cube
+
+u = 0.0:0.001:3.0;
+l1 = barr(1-u) + barr(u-2);
+plot(u, l1)
+
+function r = barr(u)
+    u(u<0) = 0;
+    r = 100*u.^3;
+end
+

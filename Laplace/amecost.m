@@ -13,7 +13,7 @@ function [val,grad] = amecost(theta,infos)
 val = 0;
 grad = zeros(1,size(theta,1));
 
-for i=1:length(infos),
+for i=1:length(infos)
     
     %fprintf(1,'Starting timing.\n');tic;
     
@@ -26,6 +26,10 @@ for i=1:length(infos),
     Ht = sum(bsxfun(@times,infos{i}.Ht,theta'),2);
     Hh = sum(bsxfun(@times,infos{i}.Hh,theta'),2);
     %fprintf(1,'Hess: %f\n',toc);tic;
+    
+%     if any(any(isnan(Ht))) || any(any(isinf(Ht)))
+%         fprintf(1,'!');
+%     end
     
     % Gradients:
     % dHt = infos{i}.Ht

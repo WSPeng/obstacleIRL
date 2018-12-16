@@ -24,7 +24,9 @@ reward = struct('type','sum','theta',theta,'features',{features});
 infos = trajinfos(features,mdp,mdp_data,example_samples);
 
 % Determine initial regularization constant.
-theta(end) = auglagfindfeasible(@(wt)amecost(wt,infos),length(features),theta);
+disp('Determine initial regularization constant.')
+theta(end) = auglagfindfeasible(@(wt)amecost(wt,infos), length(features), theta);
+% length(features) is the min idx = dyn + carts+ reg 
 
 % Set up optimization options.
 options = struct();
@@ -40,6 +42,7 @@ options.progTol = 1.0e-14;
 %end;
 
 % Run Augmented Lagrangian optimization.
+disp('Run Augmented Lagrangian optimization.')
 tic;
 theta = auglag(@(wt)amecost(wt,infos),length(features),theta,options,verbosity);
 total_time = toc;

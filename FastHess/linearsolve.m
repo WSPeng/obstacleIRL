@@ -1,5 +1,7 @@
 % Quickly solve the JHhatJ'+Htilde system.
 function [h,logDet,S,Q,R,X,W] = linearsolve(info,Ht,Hh,g)
+% the input Ht from amecost, times with theta
+
 
 % Constants.
 Dx = size(Hh,3);
@@ -22,22 +24,25 @@ X = zeros(Dx,Dx,T);
 W = zeros(Dx,Dx,T);
 logDet = 0;
 
-if Dx == Du,
+if Dx == Du
     % Special upward pass for square matrix case.
-    for t=T:-1:1,
+    for t=T:-1:1
         % Compute diagonal entry.
         Dt = info.B(:,:,t)'*(Hh(:,:,t) + zs) + Ht(:,:,t)*info.invB(:,:,t);
         % Invert and compute determinant.
-        %if any(any(isnan(Dt))) || any(any(isinf(Dt))),
-        %    fprintf(1,'!');
-        %end;
-        Dinv = inv(Dt);
+        if any(any(isnan(Dt))) || any(any(isinf(Dt)))
+            fprintf(1,'!');
+            Dt
+        end
+        % pinv
+        Dinv = pinv(Dt);
+%         Dinv = Dt\eye(2);
         Ddet = det(-Dt*info.B(:,:,t));
-        if Ddet <= 0.0 || ~isreal(Ddet) || isnan(Ddet) || isinf(Ddet),
+        if Ddet <= 0.0 || ~isreal(Ddet) || isnan(Ddet) || isinf(Ddet)
             logDet = -Inf;
         else
             logDet = logDet + log(Ddet);
-        end;
+        end
         % Compute hbar^{(0)}_t
         hbaro(:,:,t) = Dinv*(g(:,:,t) - info.B(:,:,t)'*z);
         % Compute cached matrices for trace computations.
@@ -46,7 +51,7 @@ if Dx == Du,
         X(:,:,t) = info.A(:,:,t)'*(Hh(:,:,t) + zs(:,:));
         W(:,:,t) = info.A(:,:,t)';
         % Either express hbar_t in terms of hbar_{t-1}, or solve hbar_1
-        if t > 1,
+        if t > 1
             % Solve for S_t
             S(:,:,t) = Dinv*Ht(:,:,t)*info.invB(:,:,t)*info.A(:,:,t);
             % Update temporary storage.
@@ -57,23 +62,23 @@ if Dx == Du,
             h(:,:,1) = info.invB(:,:,t)*hbaro(:,:,t);
             % Store corresponding first hbar entry.
             hbar(:,:,1) = hbaro(:,:,t);
-        end;
-    end;
+        end
+    end
 
     % Downward pass.
-    for t=2:T,
+    for t=2:T
         % Solve for hbar_t
         hbar(:,:,t) = hbaro(:,:,t) + S(:,:,t)*hbar(:,:,t-1);
         % Solve for h_t using hbar_{t-1}
         h(:,:,t) = info.invB(:,:,t)*(hbar(:,:,t) - info.A(:,:,t)*hbar(:,:,t-1));
-    end;
+    end
 else
     % Additional variables.
     d = zeros(Dx,1,T);
     C = zeros(Dx,Dx,T);
     
     % Upward pass.
-    for t=T:-1:1,
+    for t=T:-1:1
         % Compute diagonal entry.
         Dt = info.B(:,:,t)'*(Hh(:,:,t) + zs) + Ht(:,:,t)*info.invB(:,:,t);
         % Add to determinant.
@@ -86,7 +91,7 @@ else
             logDet = -Inf;
         else
             logDet = logDet + log(Ddet);
-        end;
+        end
         % Compute hbar^{(0)}_t
         hbarzt = Dinv*(g(:,:,t) - info.B(:,:,t)'*z);
         % Compute null space.
@@ -102,7 +107,7 @@ else
         % Compute hbar^{(1)}_t
         hbaro(:,:,t) = hbarzt + Nt*d((Du+1):end,:,t);
         % Either express hbar_t in terms of hbar_{t-1}, or solve hbar_1
-        if t > 1,
+        if t > 1
             % Solve for term dependent on hbar_{t-1}
             C(:,:,t) = invblck*(Dinv*Ht(:,:,t)*info.invB(:,:,t)*info.A(:,:,t) - info.A(:,:,t));
             % Solve for S_t
@@ -115,8 +120,8 @@ else
             h(:,:,1) = d(1:Du,:,t);
             % Store corresponding first hbar entry.
             hbar(:,:,1) = hbaro(:,:,t);
-        end;
-    end;
+        end
+    end
 
     % Downward pass.
     for t=2:T,
