@@ -24,6 +24,7 @@ function [states, A ,B, invB, dxdu, d2xdudu] = objectworldcontrol(mdp_data, x, u
 % end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ReLU
+u(u(:,2)<0.7,2) = 0.7;
 
 du = ones(length(u),2);
 relu = 0;
@@ -178,6 +179,9 @@ if nargout >= 2
         x1 = x1 - mdp_data.obs_params.opt_sim.obstacle{1}.x0(1);
         x2 = x2 - mdp_data.obs_params.opt_sim.obstacle{1}.x0(2);
 
+        %x1 = abs(x1)
+        %x2 = abs(x2)
+        
         % calculate the gamma
         % gamma = (x1/sf/a(1))^2 + (x2/sf/a(2))^2;
         gamma = (x1/sf)^2 + (x2/sf)^2;
@@ -198,12 +202,12 @@ if nargout >= 2
 %             (gamma)^(-1/rho-1) ;
         d_lambda(2, 1, t) = 2*x2/(rho*sf^2)*(gamma)^(-1/rho-1) ;
         % d_lambda1/d_rho
-        d_lambda(3, 1, t) = -(gamma)^(-1/rho)*log(gamma)*rho^(-2);
+        d_lambda(3, 1, t) = -(gamma)^(-1/rho)*log(gamma)*rho^(-2); %-
         % d_lambda1/d_sf
 %         d_lambda(4, 1, t) = -2/rho*((x1/a(1))^2 + (x2/a(2))^2)^(-1/rho)...  % it is not gamma inside..
 %             *(sf)^(2/rho-1);
-        d_lambda(4, 1, t) = -2/rho*(x1^2 + x2^2)^(-1/rho)*(sf)^(2/rho-1);
-
+        d_lambda(4, 1, t) = -2/rho*(x1^2 + x2^2)^(-1/rho)*(sf)^(2/rho-1);% -  2/rho-1
+ 
         % d_lambda2/d_x1
         d_lambda(1, 2, t) = -d_lambda(1, 1, t);
         % d_lambda2/d_x2
@@ -216,7 +220,7 @@ if nargout >= 2
         % some constant
 %         E = 2/sf^2*[x1/a(1)^2, x2/a(2)^2;...
 %                     x2/a(2)^2, -x1/a(1)^2]; % with the front constant related to sf..
-        E = 2/sf^2*[x1, x2;...
+        E = 2*sf^(-2)*[x1, x2;...
                     x2, -x1];
 
 %        const_1 = (x1^2/a(1)^4 + x2^2/a(2)^4);
@@ -230,14 +234,14 @@ if nargout >= 2
         % compute the derivative in matrix multiplcation form
         % d_E/d_x1
 %         d_E(:,:,1) = 2/sf^2*[1/a(1)^2, 0; 0 -1/a(1)^2];
-        d_E(:,:,1) = 2/sf^2*[1, 0; 0 -1];
+        d_E(:,:,1) = 2*sf^(-2)*[1, 0; 0 -1];
         % d_E/d_x2
 %         d_E(:,:,2) = 2/sf^2*[0, 1/a(2)^2; 1/a(2)^2, 0];
-        d_E(:,:,2) = 2/sf^2*[0, 1; 1, 0];
+        d_E(:,:,2) = 2*sf^(-2)*[0, 1; 1, 0];
         % d_E/d_rho
         d_E(:,:,3) = 0;
         %d_E/d_sf
-        d_E(:,:,4) = -2/sf*E; % 2/sf^2* is already included
+        d_E(:,:,4) = -2/sf*E; % 2/sf^2* is already included with -
 
         % d_invE/d_x1
 %         d_invE(:,:,1) = -2*x1/a(1)^4*(const_1)^(-2)*[x1/a(1)^2, x2/a(2)^2; ...
@@ -252,7 +256,7 @@ if nargout >= 2
         % d_invE/d_rho
         d_invE(:,:,3) = 0; 
         % d_invE/d_sf
-        d_invE(:,:,4) = 1/sf*2*invE;
+        d_invE(:,:,4) = +1/sf*2*invE; %without -
 
         % d_D/d_x1
         d_D(:,:,1) = [d_lambda(1,1,t), 0; 
@@ -269,15 +273,23 @@ if nargout >= 2
 
         % together
         % x1 and x2 / x1
-        dM_dx1 = d_E(:,:,1)*D*invE*dyn + E*d_D(:,:,1)*invE*dyn + ...
-            E*D*d_invE(:,:,1)*dyn;
-        dM_dx2 = d_E(:,:,2)*D*invE*dyn + E*d_D(:,:,2)*invE*dyn + ...
-            E*D*d_invE(:,:,2)*dyn;
-        dM_drho = d_E(:,:,3)*D*invE*dyn + E*d_D(:,:,3)*invE*dyn + ...
-            E*D*d_invE(:,:,3)*dyn;
-        dM_dsf = d_E(:,:,4)*D*invE*dyn + E*d_D(:,:,4)*invE*dyn + ...
-            E*D*d_invE(:,:,4)*dyn;
-
+        dM_dx1 = (d_E(:,:,1)*D*invE + E*d_D(:,:,1)*invE + ...
+            E*D*d_invE(:,:,1))*dyn;
+        dM_dx2 = (d_E(:,:,2)*D*invE + E*d_D(:,:,2)*invE + ...
+            E*D*d_invE(:,:,2))*dyn;
+        dM_drho = (d_E(:,:,3)*D*invE + E*d_D(:,:,3)*invE + ...
+            E*D*d_invE(:,:,3))*dyn;
+        dM_dsf = (d_E(:,:,4)*D*invE + E*d_D(:,:,4)*invE + ...
+            E*D*d_invE(:,:,4))*dyn;
+%         dM_dsf = E*d_D(:,:,4)*invE*dyn; 
+         dM_dsf = [1 0;0 1]*dM_dsf;
+%         disp('1')
+%         d_E(:,:,4)*D*invE
+%         disp('2')
+%         E*d_D(:,:,4)*invE*dyn
+%         disp('3')
+%         E*D*d_invE(:,:,4)
+%         
         % make things clear
         dx1_dx1 = dM_dx1(1)*options.dt + 1;
         dx2_dx1 = dM_dx1(2)*options.dt;
@@ -288,7 +300,7 @@ if nargout >= 2
         dx1_drho = dM_drho(1)*options.dt*du(t,1);
         dx2_drho = dM_drho(2)*options.dt*du(t,1);
         dx1_dsf = dM_dsf(1)*options.dt*du(t,2);
-        dx2_dsf = dM_dsf(2)*options.dt*du(t,2);
+        dx2_dsf = dM_dsf(2)*options.dt*du(t,2);%*100;
 
         % pack together
         % A is derivative with respect to previous state
@@ -312,6 +324,7 @@ if nargout >= 2
 %             BB(:,:,t) = ones(2,2);
 %         end
         invB(:,:,t) = pinv(B(:,:,t));
+        %invB(:,:,t)
     end
 
     % A = AA;B = BB;

@@ -5,4 +5,4 @@ function s = objectworldsamplestates(n,mdp_data)
 
 % s = [0, 2.2];
 
-s = [0, 2.2/10*mdp_data.bounds(1) ]; %+ 0.4*rand(1)
+s = [0, 2.2/10*mdp_data.bounds(1) + 4*rand(1) ];

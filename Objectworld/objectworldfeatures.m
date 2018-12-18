@@ -51,9 +51,9 @@ elseif mdp_params.rbf_features == 2
     % features_dyn{1} = struct('type', 'hard','r',-10000000.0,'idx',1:mdp_data.udims);
     features_dyn{1} = struct('type', 'hardcube','r',-1.0,'idx',1:mdp_data.udims);
     features_pt{1} = struct('type','cartrbf','pos',[mdp_data.objects(1).pos(:,1), mdp_data.objects(1).pos(:,end)],...
-                          'width',0.05/mdp_data.bounds(1),'r',2.0);
+                          'width',2.5/mdp_data.bounds(1),'r',2.0);
     features_pt{2} = struct('type','cartrbf','pos',[mdp_data.objects(2).pos(:,1), mdp_data.objects(2).pos(:,end)],...
-        'width',0.05/mdp_data.bounds(1),'r',2.0);
+        'width',2.5/mdp_data.bounds(1),'r',2.0);
     % features_dyn{1} = struct('type','cartrbf','pos',[0.5, 1.0],'width',1.0,'r',2.0);
                       % features_pt{2} = struct('type','cartrbf','pos',[mdp_data.objects(2).pos(:,1), mdp_data.objects(2).pos(:,end)],...
     %                       'width',1.0,'r',2.0);
@@ -185,9 +185,9 @@ elseif strcmp(mdp_params.feature_type,'obs')
     % obstacle feature
     features_pt = cell(1,1);
     features_pt{1} = struct('type','cartrbf','pos',[mdp_data.objects(1).pos(:,1), mdp_data.objects(1).pos(:,end)],...
-                          'width',0.05/mdp_data.bounds(1),'r',2.0);
+                          'width',2.5/mdp_data.bounds(1),'r',2.0);
     features_pt{2} = struct('type','cartrbf','pos',[mdp_data.objects(2).pos(:,1), mdp_data.objects(2).pos(:,end)],...
-                          'width',0.05/mdp_data.bounds(1),'r',2.0);
+                          'width',2.5/mdp_data.bounds(1),'r',2.0);
     % features_pt{2} = struct('type','cartrbf','pos',[mdp_data.objects(2).pos(:,1), mdp_data.objects(2).pos(:,end)],...
     %                      'width',2.0,'r',2.0);
     %features_pt{3} = struct('type','cartrbf','pos',[mdp_data.objects(3).pos(:,1), mdp_data.objects(3).pos(:,end)],...

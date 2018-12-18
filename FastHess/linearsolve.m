@@ -35,7 +35,12 @@ if Dx == Du
             Dt
         end
         % pinv
+        
+%         Dt
+        %Dt = Dt*1000;
         Dinv = pinv(Dt);
+        %Dinv = Dinv*1000;
+        
 %         Dinv = Dt\eye(2);
         Ddet = det(-Dt*info.B(:,:,t));
         if Ddet <= 0.0 || ~isreal(Ddet) || isnan(Ddet) || isinf(Ddet)

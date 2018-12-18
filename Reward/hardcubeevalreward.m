@@ -25,14 +25,21 @@ Dx = size(states,2);
 a = 1;
 [l1, l1g, l1gg] = barr(1 - u(:,1));
 [l2, l2g, l2gg] = barr(0.9 - u(:,2));
+% the upper bound 
+%[l3, l3g, l3gg] = barr(u(:,1) - 2000);
+%[l4, l4g, l4gg] = barr(u(:,2) - 2000);
+
 r = reward.r * sum((l1 + l2*a), 2); 
+% r = reward.r * sum((l1 + l2*a + l3 + l4*a), 2); 
 
 if nargout >= 2
     % Compute gradient with respect to controls.
     g = zeros(T,Du);
     % g(:,reward.idx) = 2.0 * reward.r * u(:,reward.idx);
-    g(:,1) = reward.r * l1g;
-    g(:,2) = reward.r * a * l2g;
+%     g(:,1) = reward.r * (l1g + l3g);
+%     g(:,2) = reward.r * a * (l2g + l4g);
+    g(:,1) = reward.r * (l1g);
+    g(:,2) = reward.r * a * (l2g);
 end
 
 if nargout >= 3
@@ -42,6 +49,8 @@ if nargout >= 3
     d2rdudu = zeros(T,Du,Du);
     mask = zeros(Du,1);
     for t = 1:T
+%         mask(1,1) = l1gg(t) + l3gg(t);
+%         mask(2,1) = a*l2gg(t) + a*l4gg(t);
         mask(1,1) = l1gg(t);
         mask(2,1) = a*l2gg(t);
         d2rdudu(t,:,:) = reward.r * diag(mask);

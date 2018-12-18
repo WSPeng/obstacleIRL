@@ -83,7 +83,7 @@ elseif mdp_params.fixed_pattern == 3
     objects(1) = struct('pos',[0.5, 0.2]*mdp_params.size,'c1',2,'c2',1);
     % objects(2) = struct('pos',[0.35, 0.0]*mdp_params.size,'c1',2,'c2',1);
     % objects(3) = struct('pos',[0.65, 0.0]*mdp_params.size,'c1',2,'c2',1);
-    objects(2) = struct('pos',[0.5, 0.9]*mdp_params.size,'c1',2,'c2',1);
+    objects(2) = struct('pos',[0.1, 0.3]*mdp_params.size,'c1',2,'c2',1);
     
     % remove one dim reward
     % objects(length(objects)+1) = struct('pos',0,'c1',1,'c2',1);
